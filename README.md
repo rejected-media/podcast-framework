@@ -10,7 +10,8 @@ A production-ready, NPM-based framework for creating beautiful podcast websites 
 
 **Current Phase:** Phase 1 - Foundation (Weeks 1-2)
 **Week 0:** ✅ Complete (NPM org, GitHub org, tokens configured)
-**Week 1:** 🔄 In Progress (Monorepo setup)
+**Week 1:** ✅ Complete (8 components, resolver, theme, utilities)
+**Week 2:** 🔄 In Progress (Sanity utilities, hosting adapter, comprehensive tests)
 
 ---
 
@@ -18,9 +19,48 @@ A production-ready, NPM-based framework for creating beautiful podcast websites 
 
 This monorepo contains:
 
-- **[@podcast-framework/core](./packages/core)** - Core components, layouts, and utilities
-- **[@podcast-framework/cli](./packages/cli)** - CLI tool for scaffolding and management
-- **[@podcast-framework/sanity-schema](./packages/sanity-schema)** - Base CMS schemas with extension support
+- **[@podcast-framework/core](./packages/core)** - Core components, layouts, and utilities ✅ **Ready**
+  - 8 production-tested components
+  - Component resolver (bundler-safe)
+  - Theme system with validation
+  - Sanity CMS utilities
+  - Hosting platform adapter
+  - 73 tests passing
+
+- **[@podcast-framework/cli](./packages/cli)** - CLI tool for scaffolding and management ⏳ **Coming Week 4**
+
+- **[@podcast-framework/sanity-schema](./packages/sanity-schema)** - Base CMS schemas ⏳ **Coming Week 3**
+
+---
+
+## ✨ Current Features (@podcast-framework/core@0.1.0)
+
+### Components (8)
+- ✅ Header - Navigation with mobile menu
+- ✅ Footer - Social links and newsletter
+- ✅ NewsletterSignup - Email form with spam protection
+- ✅ EpisodeSearch - Client-side fuzzy search
+- ✅ TranscriptViewer - Collapsible, searchable transcripts
+- ✅ FeaturedEpisodesCarousel - Auto-progressing carousel
+- ✅ SkeletonLoader - Loading states (4 variants)
+- ✅ BlockContent - Sanity portable text renderer
+
+### Infrastructure
+- ✅ Component resolver (bundler-safe with import.meta.glob)
+- ✅ Theme system (CSS variables with injection prevention)
+- ✅ Sanity CMS utilities (client, queries, caching)
+- ✅ Hosting adapter (Cloudflare/Netlify/Vercel support)
+- ✅ Utility functions (formatDate, stripHTML, slugify, etc.)
+- ✅ TypeScript types (Episode, Guest, Theme, etc.)
+- ✅ Build pipeline (tsup + declarations)
+
+### Quality
+- ✅ 73 tests passing
+- ✅ TypeScript strict mode
+- ✅ Input validation
+- ✅ Security hardened (XSS, CSS injection prevention)
+- ✅ ESLint configured
+- ✅ CI/CD ready (GitHub Actions)
 
 ---
 
@@ -104,8 +144,9 @@ npm run test
 
 ## 🗺️ Roadmap
 
-- [x] **Week 0:** Prerequisites (NPM org, GitHub org, tokens)
-- [ ] **Week 1-2:** Core extraction and component resolver
+- [x] **Week 0:** Prerequisites (NPM org, GitHub org, tokens) ✅
+- [x] **Week 1:** Core components extraction ✅ (8 components, resolver, theme)
+- [ ] **Week 2:** Complete utilities extraction 🔄 (Sanity, hosting adapter)
 - [ ] **Week 3:** Schema system
 - [ ] **Week 4-7:** CLI tool
 - [ ] **Week 8:** Template repository
@@ -113,6 +154,9 @@ npm run test
 - [ ] **Week 11:** Testing & validation
 - [ ] **Week 12:** Launch preparation
 - [ ] **Week 13-14:** Beta launch
+
+**Current Week:** Week 2 (73% complete)
+**Timeline:** On track for 12-14 week beta launch
 
 ---
 
