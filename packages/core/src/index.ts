@@ -37,6 +37,18 @@ export {
   getGuestBySlug
 } from './lib/sanity';
 
+// Hosting platform adapter
+export {
+  detectPlatform,
+  getEnvironmentVariables,
+  getEnv,
+  getRequiredEnv,
+  getClientIP,
+  getPlatformInfo,
+  logError
+} from './lib/hosting-adapter';
+export type { HostingPlatform } from './lib/hosting-adapter';
+
 // TypeScript types
 export type {
   Episode,
