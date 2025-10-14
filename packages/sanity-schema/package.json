@@ -6,9 +6,11 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./schemas/*": "./src/schemas/*",
-    "./migrations/*": "./src/migrations/*"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schemas/*": "./dist/schemas/*"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
