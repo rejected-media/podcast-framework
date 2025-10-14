@@ -64,9 +64,9 @@ export function decodeHTMLEntities(text: string): string {
     // Replace named entities using lookup table
     .replace(/&[#\w]+;/g, (entity) => entities[entity] || entity)
     // Decode numeric HTML entities (decimal): &#39; → '
-    .replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec))
+    .replace(/&#(\d+);/g, (_match, dec) => String.fromCharCode(dec))
     // Decode hexadecimal HTML entities: &#x27; → '
-    .replace(/&#x([0-9a-fA-F]+);/g, (match, hex) => String.fromCharCode(parseInt(hex, 16)));
+    .replace(/&#x([0-9a-fA-F]+);/g, (_match, hex) => String.fromCharCode(parseInt(hex, 16)));
 }
 
 /**
