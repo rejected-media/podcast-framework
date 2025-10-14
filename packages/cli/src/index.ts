@@ -19,18 +19,22 @@ program
   .version('0.1.0');
 
 // Import commands
+import { createCommand } from './commands/create';
+import { infoCommand } from './commands/info';
 import { listComponentsCommand } from './commands/list-components';
-import { checkUpdatesCommand } from './commands/check-updates';
+import { listSchemasCommand } from './commands/list-schemas';
 import { validateCommand } from './commands/validate';
 import { overrideCommand } from './commands/override';
-import { listSchemasCommand } from './commands/list-schemas';
+import { checkUpdatesCommand } from './commands/check-updates';
 
-// Register commands
-program.addCommand(listComponentsCommand);
-program.addCommand(checkUpdatesCommand);
+// Register commands (in logical order)
+program.addCommand(createCommand);
+program.addCommand(infoCommand);
 program.addCommand(validateCommand);
-program.addCommand(overrideCommand);
+program.addCommand(listComponentsCommand);
 program.addCommand(listSchemasCommand);
+program.addCommand(overrideCommand);
+program.addCommand(checkUpdatesCommand);
 
 // Parse arguments
 program.parse(process.argv);
