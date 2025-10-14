@@ -21,10 +21,16 @@ program
 // Import commands
 import { listComponentsCommand } from './commands/list-components';
 import { checkUpdatesCommand } from './commands/check-updates';
+import { validateCommand } from './commands/validate';
+import { overrideCommand } from './commands/override';
+import { listSchemasCommand } from './commands/list-schemas';
 
 // Register commands
 program.addCommand(listComponentsCommand);
 program.addCommand(checkUpdatesCommand);
+program.addCommand(validateCommand);
+program.addCommand(overrideCommand);
+program.addCommand(listSchemasCommand);
 
 // Parse arguments
 program.parse(process.argv);
