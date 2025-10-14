@@ -21,10 +21,13 @@ program
 // Import commands
 import { createCommand } from './commands/create';
 import { infoCommand } from './commands/info';
+import { validateCommand } from './commands/validate';
 import { listComponentsCommand } from './commands/list-components';
 import { listSchemasCommand } from './commands/list-schemas';
-import { validateCommand } from './commands/validate';
 import { overrideCommand } from './commands/override';
+import { updateCommand } from './commands/update';
+import { rollbackCommand } from './commands/rollback';
+import { migrateSchemaCommand } from './commands/migrate-schema';
 import { checkUpdatesCommand } from './commands/check-updates';
 
 // Register commands (in logical order)
@@ -34,6 +37,9 @@ program.addCommand(validateCommand);
 program.addCommand(listComponentsCommand);
 program.addCommand(listSchemasCommand);
 program.addCommand(overrideCommand);
+program.addCommand(updateCommand);
+program.addCommand(rollbackCommand);
+program.addCommand(migrateSchemaCommand);
 program.addCommand(checkUpdatesCommand);
 
 // Parse arguments
