@@ -25,6 +25,18 @@ export {
 // Theme utilities
 export { defaultTheme, generateThemeCSS, getGoogleFontsURL, mergeTheme } from './lib/theme';
 
+// Sanity CMS utilities
+export {
+  createSanityClient,
+  cachedFetch,
+  getAllEpisodes,
+  getEpisodeBySlug,
+  getFeaturedEpisodes,
+  getPodcastInfo,
+  getAllGuests,
+  getGuestBySlug
+} from './lib/sanity';
+
 // TypeScript types
 export type {
   Episode,
