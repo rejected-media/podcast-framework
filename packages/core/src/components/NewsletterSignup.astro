@@ -1,0 +1,244 @@
+---
+/**
+ * Newsletter Signup Component
+ *
+ * Email subscription form with two variants (inline/footer)
+ * Includes honeypot spam protection and accessible form controls
+ *
+ * @component
+ * @example
+ * ```astro
+ * import NewsletterSignup from '@podcast-framework/core/components/NewsletterSignup.astro';
+ *
+ * <NewsletterSignup
+ *   variant="inline"
+ *   placeholder="your@email.com"
+ *   buttonText="Subscribe"
+ * />
+ * ```
+ */
+
+interface Props {
+  variant?: 'inline' | 'footer';
+  placeholder?: string;
+  buttonText?: string;
+}
+
+const {
+  variant = 'inline',
+  placeholder = 'Your email address',
+  buttonText = 'Subscribe'
+} = Astro.props;
+---
+
+<div class={`newsletter-signup newsletter-${variant}`}>
+  <form id={`newsletter-form-${variant}`} class="newsletter-form">
+    <div class="newsletter-input-wrapper">
+      <label for={`email-${variant}`} class="sr-only">Email address</label>
+      <input
+        type="email"
+        id={`email-${variant}`}
+        name="email"
+        placeholder={placeholder}
+        required
+        aria-required="true"
+        aria-describedby={`newsletter-status-${variant}`}
+      />
+      <!-- Honeypot field for spam protection -->
+      <input
+        type="text"
+        name="website"
+        style="display:none"
+        tabindex="-1"
+        aria-hidden="true"
+        autocomplete="off"
+      />
+      <button type="submit">{buttonText}</button>
+    </div>
+    <div
+      id={`newsletter-status-${variant}`}
+      class="newsletter-status"
+      role="status"
+      aria-live="polite"
+    ></div>
+  </form>
+</div>
+
+<style>
+  .newsletter-signup {
+    width: 100%;
+  }
+
+  .newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .newsletter-input-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .newsletter-inline .newsletter-form {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .newsletter-footer .newsletter-form {
+    max-width: 500px;
+  }
+
+  input[type="email"] {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  input[type="email"]:focus {
+    outline: none;
+    border-color: rgb(var(--color-primary));
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+  }
+
+  button {
+    padding: 0.75rem 1.5rem;
+    background: rgb(var(--color-primary));
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+
+  button:hover {
+    opacity: 0.9;
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .newsletter-status {
+    font-size: 0.875rem;
+    min-height: 1.25rem;
+    text-align: center;
+    width: 100%;
+  }
+
+  .newsletter-status.success {
+    color: #10b981;
+    font-weight: 500;
+  }
+
+  .newsletter-status.error {
+    color: #ef4444;
+    font-weight: 500;
+  }
+
+  /* Screen reader only text */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  @media (max-width: 640px) {
+    .newsletter-input-wrapper {
+      flex-direction: column;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  function initNewsletterForm(variant: string) {
+    const form = document.getElementById(`newsletter-form-${variant}`) as HTMLFormElement;
+    const statusDiv = document.getElementById(`newsletter-status-${variant}`) as HTMLDivElement;
+    const inputWrapper = form?.querySelector('.newsletter-input-wrapper') as HTMLDivElement;
+    const emailInput = form?.querySelector('input[type="email"]') as HTMLInputElement;
+    const button = form?.querySelector('button') as HTMLButtonElement;
+
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = emailInput.value.trim();
+      const website = (form.querySelector('input[name="website"]') as HTMLInputElement)?.value;
+
+      // Honeypot check - if website field is filled, it's a bot
+      if (website) {
+        // Silently succeed to not reveal honeypot
+        statusDiv.textContent = 'Thanks for subscribing!';
+        statusDiv.className = 'newsletter-status success';
+        inputWrapper.style.display = 'none';
+        return;
+      }
+
+      // Clear previous status
+      statusDiv.textContent = '';
+      statusDiv.className = 'newsletter-status';
+
+      // Disable form during submission
+      button.disabled = true;
+      const originalText = button.textContent;
+      button.textContent = 'Subscribing...';
+
+      try {
+        const response = await fetch('/api/newsletter-subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          statusDiv.textContent = data.message || 'Thanks for subscribing!';
+          statusDiv.className = 'newsletter-status success';
+          inputWrapper.style.display = 'none';
+          form.reset();
+        } else {
+          statusDiv.textContent = data.message || 'Something went wrong. Please try again.';
+          statusDiv.className = 'newsletter-status error';
+        }
+      } catch (error) {
+        statusDiv.textContent = 'Network error. Please check your connection and try again.';
+        statusDiv.className = 'newsletter-status error';
+      } finally {
+        button.disabled = false;
+        button.textContent = originalText || 'Subscribe';
+      }
+    });
+  }
+
+  // Initialize all newsletter forms on the page
+  document.addEventListener('DOMContentLoaded', () => {
+    const forms = document.querySelectorAll('[id^="newsletter-form-"]');
+    forms.forEach((form) => {
+      const variant = form.id.replace('newsletter-form-', '');
+      initNewsletterForm(variant);
+    });
+  });
+</script>

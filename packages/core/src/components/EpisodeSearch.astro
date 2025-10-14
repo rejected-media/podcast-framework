@@ -1,0 +1,173 @@
+---
+/**
+ * Episode Search Component
+ *
+ * Client-side search for filtering episodes by title, description, and guest names.
+ * Uses vanilla JavaScript for minimal bundle size.
+ *
+ * Features:
+ * - Real-time search as user types
+ * - Fuzzy matching (case-insensitive, partial matches)
+ * - Searches across: title, description, guest names
+ * - Preserves original order when no search query
+ * - Shows result count
+ * - Keyboard accessible (Escape to clear)
+ *
+ * @component
+ * @example
+ * ```astro
+ * import EpisodeSearch from '@podcast-framework/core/components/EpisodeSearch.astro';
+ *
+ * <EpisodeSearch placeholder="Search episodes..." />
+ *
+ * <!-- Episode cards need data attributes: -->
+ * <article
+ *   data-episode-card
+ *   data-episode-title="Episode Title"
+ *   data-episode-description="Episode description"
+ *   data-episode-guests="Guest Name 1, Guest Name 2"
+ * >
+ *   <!-- Episode content -->
+ * </article>
+ * ```
+ */
+
+interface Props {
+  placeholder?: string;
+}
+
+const { placeholder = "Search episodes by title, guest, or topic..." } = Astro.props;
+---
+
+<div class="mb-8">
+  <div class="relative">
+    <input
+      type="text"
+      id="episode-search"
+      placeholder={placeholder}
+      class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
+      style="--tw-ring-color: rgb(var(--color-primary));"
+      aria-label="Search episodes"
+    />
+    <svg
+      class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
+    </svg>
+  </div>
+
+  <!-- Result Count -->
+  <div
+    id="search-results-count"
+    class="mt-2 text-sm text-gray-600 hidden"
+    role="status"
+    aria-live="polite"
+  >
+  </div>
+</div>
+
+<script>
+  // Wait for DOM to be ready
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('episode-search') as HTMLInputElement;
+    const resultsCount = document.getElementById('search-results-count');
+    const episodeCards = document.querySelectorAll('[data-episode-card]');
+
+    if (!searchInput || !resultsCount) return;
+
+    const totalEpisodes = episodeCards.length;
+
+    /**
+     * Normalize string for search matching
+     * - Lowercase
+     * - Remove special characters
+     * - Trim whitespace
+     */
+    function normalizeText(text: string): string {
+      return text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    /**
+     * Check if episode matches search query
+     */
+    function matchesSearch(episode: Element, query: string): boolean {
+      if (!query) return true; // No query = show all
+
+      const normalizedQuery = normalizeText(query);
+
+      // Get searchable text from data attributes
+      const title = episode.getAttribute('data-episode-title') || '';
+      const description = episode.getAttribute('data-episode-description') || '';
+      const guests = episode.getAttribute('data-episode-guests') || '';
+
+      // Combine all searchable text
+      const searchableText = normalizeText(`${title} ${description} ${guests}`);
+
+      // Check if query appears in searchable text
+      return searchableText.includes(normalizedQuery);
+    }
+
+    /**
+     * Filter episodes based on search query
+     */
+    function filterEpisodes() {
+      const query = searchInput.value;
+      let visibleCount = 0;
+
+      episodeCards.forEach((card) => {
+        const matches = matchesSearch(card, query);
+
+        if (matches) {
+          (card as HTMLElement).style.display = '';
+          visibleCount++;
+        } else {
+          (card as HTMLElement).style.display = 'none';
+        }
+      });
+
+      // Update result count
+      if (query.trim()) {
+        resultsCount.textContent = `Found ${visibleCount} of ${totalEpisodes} episodes`;
+        resultsCount.classList.remove('hidden');
+      } else {
+        resultsCount.classList.add('hidden');
+      }
+    }
+
+    // Add event listener for real-time search
+    searchInput.addEventListener('input', filterEpisodes);
+
+    // Clear search on Escape key
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        searchInput.value = '';
+        filterEpisodes();
+        searchInput.blur();
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Smooth transition for hiding/showing episodes */
+  [data-episode-card] {
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  /* Focus styles for accessibility */
+  #episode-search:focus {
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+  }
+</style>

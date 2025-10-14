@@ -8,16 +8,43 @@
  */
 
 // Component resolver (critical for override system)
-export { getComponent } from './lib/component-resolver';
+export { getComponent, hasOverride, listComponents } from './lib/component-resolver';
 
 // Utilities
-export { formatDate, stripHTML } from './lib/utils';
-export type { Episode, Guest, Host, Theme, PodcastInfo } from './lib/types';
+export {
+  formatDate,
+  stripHTML,
+  escapeHTML,
+  decodeHTMLEntities,
+  truncate,
+  slugify,
+  parseDuration,
+  formatDuration
+} from './lib/utils';
 
-// Re-export components (for direct imports)
-// Components are also importable via: @podcast-framework/core/components/Header.astro
+// Theme utilities
+export { defaultTheme, generateThemeCSS, getGoogleFontsURL, mergeTheme } from './lib/theme';
+
+// TypeScript types
+export type {
+  Episode,
+  Guest,
+  Host,
+  Theme,
+  PodcastInfo,
+  NavigationItem,
+  PodcastConfig,
+  TranscriptSegment
+} from './lib/types';
 
 /**
+ * Available Components:
+ * - Header.astro - Main navigation header
+ * - Footer.astro - Site footer with social links
+ * - NewsletterSignup.astro - Email subscription form
+ * - EpisodeSearch.astro - Client-side episode search
+ * - TranscriptViewer.astro - Collapsible transcript with search
+ *
  * Usage Examples:
  *
  * 1. Import component directly:

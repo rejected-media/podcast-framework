@@ -1,0 +1,151 @@
+---
+/**
+ * Footer Component
+ *
+ * Site footer with brand info, navigation, social links, and optional newsletter signup
+ *
+ * @component
+ * @example
+ * ```astro
+ * import Footer from '@podcast-framework/core/components/Footer.astro';
+ *
+ * <Footer
+ *   siteName="My Podcast"
+ *   siteDescription="Great conversations"
+ *   navigation={[
+ *     { href: '/', label: 'Home' },
+ *     { href: '/episodes', label: 'Episodes' }
+ *   ]}
+ *   socialLinks={[
+ *     { href: 'https://spotify.com/...', label: 'Spotify' },
+ *     { href: 'https://apple.com/...', label: 'Apple Podcasts' }
+ *   ]}
+ * />
+ * ```
+ */
+
+import type { Theme } from '../lib/types';
+import { defaultTheme } from '../lib/theme';
+
+export interface SocialLink {
+  href: string;
+  label: string;
+  icon?: string; // Optional icon component
+}
+
+export interface Props {
+  siteName: string;
+  siteDescription?: string;
+  navigation?: Array<{ href: string; label: string; show?: boolean }>;
+  socialLinks?: SocialLink[];
+  theme?: Theme;
+  showNewsletter?: boolean;
+}
+
+const {
+  siteName,
+  siteDescription = '',
+  navigation = [
+    { href: '/', label: 'Home' },
+    { href: '/episodes', label: 'Episodes' },
+    { href: '/guests', label: 'Guests' },
+    { href: '/about', label: 'About' }
+  ],
+  socialLinks = [],
+  theme = defaultTheme,
+  showNewsletter = false
+} = Astro.props;
+
+const currentYear = new Date().getFullYear();
+const visibleNav = navigation.filter(item => item.show !== false);
+---
+
+<footer style="background: var(--color-footer-bg); color: var(--color-footer-text);" class="mt-16">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-12 mb-8">
+      <!-- Brand Section -->
+      <div class="max-w-md">
+        <h3 class="font-bold text-lg mb-4" style="color: var(--color-secondary);">
+          {siteName}
+        </h3>
+        {siteDescription && (
+          <p class="text-sm leading-relaxed">
+            {siteDescription}
+          </p>
+        )}
+      </div>
+
+      <!-- Navigation Section -->
+      {visibleNav.length > 0 && (
+        <div>
+          <h4 class="font-semibold mb-4" style="color: var(--color-secondary);">
+            Navigation
+          </h4>
+          <ul class="space-y-2 text-sm">
+            {visibleNav.map((item) => (
+              <li>
+                <a href={item.href} class="hover:opacity-75 transition">
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <!-- Subscribe/Social Links Section -->
+      {socialLinks.length > 0 && (
+        <div>
+          <h4 class="font-semibold mb-4" style="color: var(--color-secondary);">
+            Subscribe
+          </h4>
+          <ul class="space-y-2 text-sm">
+            {socialLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="hover:opacity-75 transition"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+
+    <!-- Newsletter Signup Slot (optional) -->
+    {showNewsletter && (
+      <div
+        class="border-t pt-8 mb-8"
+        style:border-color={`rgba(${theme.colors.primary}, 0.2)`}
+      >
+        <div class="max-w-md mx-auto">
+          <h4 class="font-semibold mb-4 text-center" style="color: var(--color-secondary);">
+            Get Episode Updates
+          </h4>
+          <!-- Allow podcast to provide newsletter component via slot -->
+          <slot name="newsletter">
+            <p class="text-sm text-center opacity-75">
+              Newsletter signup component goes here
+            </p>
+          </slot>
+        </div>
+      </div>
+    )}
+
+    <!-- Copyright -->
+    <div
+      class={`pt-8 text-center text-sm ${showNewsletter ? '' : 'border-t'}`}
+      style:border-color={`rgba(${theme.colors.primary}, 0.2)`}
+    >
+      <p>
+        &copy; {currentYear}{' '}
+        <span style="color: var(--color-secondary);">{siteName}</span>. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>
