@@ -61,9 +61,11 @@ export function getComponent(name: string) {
   }
 
   // Component not found in either location
+  const availableNames = listComponents();
   throw new Error(
-    `Component "${name}" not found in framework or local overrides. ` +
-    `Available framework components: ${Object.keys(frameworkComponents).join(', ')}`
+    `Component "${name}" not found in framework or local overrides.\n` +
+    `Available components: ${availableNames.join(', ')}\n` +
+    `\nTip: Check spelling or run 'npx @podcast-framework/cli list-components'`
   );
 }
 

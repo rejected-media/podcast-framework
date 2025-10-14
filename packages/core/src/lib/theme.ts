@@ -33,26 +33,82 @@ export const defaultTheme: Theme = {
 };
 
 /**
+ * Validate RGB color value
+ * Ensures value is in correct format: "123, 456, 789"
+ * Prevents CSS injection attacks
+ */
+function validateRGBValue(value: string, fallback: string = '0, 0, 0'): string {
+  // Only allow RGB format: "123, 456, 789"
+  // Each number must be 0-255
+  const rgbPattern = /^(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})$/;
+  const match = value.match(rgbPattern);
+
+  if (!match) {
+    console.warn(`Invalid RGB value: "${value}", using fallback: ${fallback}`);
+    return fallback;
+  }
+
+  // Validate each component is 0-255
+  const [, r, g, b] = match;
+  const values = [parseInt(r), parseInt(g), parseInt(b)];
+
+  if (values.some(v => v > 255)) {
+    console.warn(`RGB value out of range: "${value}", using fallback: ${fallback}`);
+    return fallback;
+  }
+
+  return value;
+}
+
+/**
+ * Sanitize font family to prevent CSS injection
+ */
+function sanitizeFontFamily(fontFamily: string): string {
+  // Allow alphanumeric, spaces, commas, hyphens, quotes
+  // Block semicolons, braces, and other CSS syntax
+  const sanitized = fontFamily.replace(/[{};]/g, '');
+  return sanitized.trim();
+}
+
+/**
  * Generate CSS custom properties from theme
  * Used in <style> tag to inject theme variables
+ * Validates all values to prevent CSS injection
  */
 export function generateThemeCSS(theme: Theme): string {
+  // Validate all color values
+  const colors = {
+    primary: validateRGBValue(theme.colors.primary, defaultTheme.colors.primary),
+    secondary: validateRGBValue(theme.colors.secondary, defaultTheme.colors.secondary),
+    accent: validateRGBValue(theme.colors.accent, defaultTheme.colors.accent),
+    background: validateRGBValue(theme.colors.background, defaultTheme.colors.background),
+    text: validateRGBValue(theme.colors.text, defaultTheme.colors.text),
+    headerBg: validateRGBValue(theme.colors.headerBg, defaultTheme.colors.headerBg),
+    headerText: validateRGBValue(theme.colors.headerText, defaultTheme.colors.headerText),
+    footerBg: validateRGBValue(theme.colors.footerBg, defaultTheme.colors.footerBg),
+    footerText: validateRGBValue(theme.colors.footerText, defaultTheme.colors.footerText),
+  };
+
+  // Sanitize font families
+  const fontFamily = sanitizeFontFamily(theme.typography.fontFamily);
+  const headingFont = sanitizeFontFamily(theme.typography.headingFont || theme.typography.fontFamily);
+
   return `
     :root {
       /* Colors (RGB format allows rgba() usage) */
-      --color-primary: ${theme.colors.primary};
-      --color-secondary: ${theme.colors.secondary};
-      --color-accent: ${theme.colors.accent};
-      --color-background: ${theme.colors.background};
-      --color-text: ${theme.colors.text};
-      --color-header-bg: ${theme.colors.headerBg};
-      --color-header-text: ${theme.colors.headerText};
-      --color-footer-bg: ${theme.colors.footerBg};
-      --color-footer-text: ${theme.colors.footerText};
+      --color-primary: ${colors.primary};
+      --color-secondary: ${colors.secondary};
+      --color-accent: ${colors.accent};
+      --color-background: ${colors.background};
+      --color-text: ${colors.text};
+      --color-header-bg: ${colors.headerBg};
+      --color-header-text: ${colors.headerText};
+      --color-footer-bg: ${colors.footerBg};
+      --color-footer-text: ${colors.footerText};
 
       /* Typography */
-      --font-family: ${theme.typography.fontFamily};
-      --font-heading: ${theme.typography.headingFont || theme.typography.fontFamily};
+      --font-family: ${fontFamily};
+      --font-heading: ${headingFont};
     }
 
     body {

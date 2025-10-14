@@ -19,6 +19,12 @@
  */
 export function formatDate(dateString: string, locale: string = 'en-US'): string {
   const date = new Date(dateString);
+
+  // Validate date
+  if (isNaN(date.getTime())) {
+    throw new Error(`Invalid date format: "${dateString}"`);
+  }
+
   return date.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'long',
@@ -161,6 +167,16 @@ export function parseDuration(duration: string): number {
   if (!duration) return 0;
 
   const parts = duration.split(':').map(Number);
+
+  // Validate all parts are numbers
+  if (parts.some(isNaN)) {
+    throw new Error(`Invalid duration format: "${duration}". Expected HH:MM:SS, MM:SS, or SS`);
+  }
+
+  // Validate part count
+  if (parts.length > 3 || parts.length === 0) {
+    throw new Error(`Invalid duration format: "${duration}". Too many or too few colons.`);
+  }
 
   if (parts.length === 3) {
     // HH:MM:SS
