@@ -1,0 +1,295 @@
+---
+/**
+ * Featured Episodes Carousel
+ *
+ * Horizontal scrolling carousel for featured episodes with auto-progression
+ *
+ * Features:
+ * - Auto-progression (loops through episodes)
+ * - Previous/Next navigation
+ * - Dot indicators
+ * - Mobile responsive
+ * - Accessibility features (ARIA labels, keyboard navigation)
+ *
+ * @component
+ * @example
+ * ```astro
+ * import FeaturedEpisodesCarousel from '@podcast-framework/core/components/FeaturedEpisodesCarousel.astro';
+ *
+ * <FeaturedEpisodesCarousel
+ *   episodes={featuredEpisodes}
+ *   title="Featured Episodes"
+ *   fallbackImage="/logo.png"
+ * />
+ * ```
+ */
+
+import type { Episode, Theme } from '../lib/types';
+import { stripHTML } from '../lib/utils';
+import { defaultTheme } from '../lib/theme';
+
+export interface Props {
+  episodes: Episode[];
+  title?: string;
+  fallbackImage?: string;
+  theme?: Theme;
+  autoProgressInterval?: number; // milliseconds, default 6000
+}
+
+const {
+  episodes,
+  title = 'Featured Episodes',
+  fallbackImage,
+  theme = defaultTheme,
+  autoProgressInterval = 6000
+} = Astro.props;
+
+// Don't render if no episodes
+if (!episodes || episodes.length === 0) {
+  return null;
+}
+---
+
+<section style="background: var(--color-surface);" class="py-12">
+  <div class="max-w-5xl mx-auto px-4">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-3xl font-bold" style="color: var(--color-text);">{title}</h2>
+      <div class="flex gap-2">
+        <button
+          id="carousel-prev"
+          style="background: var(--color-background);"
+          class={`p-2 ${theme.layout.borderRadius} shadow-md hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed`}
+          aria-label="Previous episode"
+        >
+          <svg class="w-6 h-6" style="color: var(--color-text);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <button
+          id="carousel-next"
+          style="background: var(--color-background);"
+          class={`p-2 ${theme.layout.borderRadius} shadow-md hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed`}
+          aria-label="Next episode"
+        >
+          <svg class="w-6 h-6" style="color: var(--color-text);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="relative overflow-hidden"
+      role="region"
+      aria-label="Featured Episodes Carousel"
+    >
+      <div
+        id="carousel-container"
+        class="flex transition-transform duration-500 ease-in-out"
+        role="list"
+        aria-live="polite"
+      >
+        {episodes.map((episode, index) => (
+          <a
+            href={`/episodes/${episode.slug.current}`}
+            style="background: var(--color-surface);"
+            class={`flex-shrink-0 w-full ${theme.layout.borderRadius} shadow-lg hover:shadow-2xl border border-opacity-30 hover:border-opacity-70 transition group`}
+            style:border-color={`rgb(var(--color-primary))`}
+            role="listitem"
+            aria-posinset={index + 1}
+            aria-setsize={episodes.length}
+            aria-label={`Episode ${episode.episodeNumber}: ${episode.title}`}
+          >
+            <div class="flex flex-col md:flex-row gap-6 p-6">
+              <!-- Episode Image -->
+              <div class="flex-shrink-0">
+                {episode.coverImage?.url ? (
+                  <img
+                    src={episode.coverImage.url}
+                    alt={episode.title}
+                    class={`w-full md:w-64 h-64 object-cover ${theme.layout.borderRadius} group-hover:scale-105 transition-transform duration-300`}
+                    loading="lazy"
+                  />
+                ) : fallbackImage ? (
+                  <img
+                    src={fallbackImage}
+                    alt={episode.title}
+                    class={`w-full md:w-64 h-64 object-cover ${theme.layout.borderRadius} group-hover:scale-105 transition-transform duration-300`}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div
+                    style="background: var(--color-surface);"
+                    class={`w-full md:w-64 h-64 ${theme.layout.borderRadius} flex items-center justify-center border`}
+                    style:border-color={`rgb(var(--color-primary))`}
+                  >
+                    <span class="text-5xl font-bold" style="color: var(--color-primary);">
+                      {episode.episodeNumber}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <!-- Episode Content -->
+              <div class="flex-grow flex flex-col">
+                <p class="text-sm uppercase tracking-wide mb-2" style="color: var(--color-primary);">
+                  Episode {episode.episodeNumber}
+                </p>
+                <h3 class="text-2xl font-semibold group-hover:opacity-80 transition-opacity mb-4" style="color: var(--color-text);">
+                  {episode.title}
+                </h3>
+
+                <!-- Guests -->
+                {episode.guests && episode.guests.length > 0 && (
+                  <p class="text-sm mb-4" style="color: var(--color-text-muted);">
+                    <span class="font-semibold">Guests:</span> {episode.guests.map(g => g.name).join(", ")}
+                  </p>
+                )}
+
+                <!-- Description -->
+                {episode.description && (
+                  <p class="leading-relaxed line-clamp-4" style="color: var(--color-text-muted);">
+                    {stripHTML(episode.description)}
+                  </p>
+                )}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <!-- Dot indicators -->
+    <div class="flex justify-center gap-2 mt-6">
+      {episodes.map((_, index) => (
+        <button
+          class={`carousel-dot w-2 h-2 ${theme.layout.borderRadius} transition-all hover:opacity-100`}
+          style="background: var(--color-text); opacity: 0.3;"
+          data-index={index}
+          aria-label={`Go to episode ${index + 1}`}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ autoProgressInterval }}>
+  // Carousel controller - inlined for self-contained component
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('carousel-container');
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
+    const dots = document.querySelectorAll('.carousel-dot');
+
+    if (!container || !prevBtn || !nextBtn || dots.length === 0) return;
+
+    let currentIndex = 0;
+    const totalItems = dots.length;
+    let autoProgressTimer = null;
+
+    function getCardWidth() {
+      const firstCard = container.children[0];
+      return firstCard?.getBoundingClientRect().width || 0;
+    }
+
+    function updateCarousel() {
+      const maxIndex = Math.max(0, totalItems - 1);
+      currentIndex = Math.min(currentIndex, maxIndex);
+
+      const cardWidth = getCardWidth();
+      const offset = -(currentIndex * cardWidth);
+
+      container.style.transform = `translateX(${offset}px)`;
+
+      // Update button states
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex >= maxIndex;
+
+      // Update dot indicators
+      dots.forEach((dot, index) => {
+        if (index === currentIndex) {
+          dot.style.opacity = '1';
+          dot.style.width = '2rem';
+        } else {
+          dot.style.opacity = '0.3';
+          dot.style.width = '0.5rem';
+        }
+      });
+    }
+
+    function handlePrev() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCarousel();
+        resetAutoProgress();
+      }
+    }
+
+    function handleNext() {
+      const maxIndex = totalItems - 1;
+      if (currentIndex < maxIndex) {
+        currentIndex++;
+      } else {
+        // Loop back to start
+        currentIndex = 0;
+      }
+      updateCarousel();
+      resetAutoProgress();
+    }
+
+    function handleDotClick(index) {
+      currentIndex = index;
+      updateCarousel();
+      resetAutoProgress();
+    }
+
+    function nextSlide() {
+      const maxIndex = totalItems - 1;
+      if (currentIndex < maxIndex) {
+        currentIndex++;
+      } else {
+        currentIndex = 0;
+      }
+      updateCarousel();
+    }
+
+    function startAutoProgress() {
+      autoProgressTimer = window.setInterval(nextSlide, autoProgressInterval);
+    }
+
+    function resetAutoProgress() {
+      if (autoProgressTimer) {
+        clearInterval(autoProgressTimer);
+      }
+      startAutoProgress();
+    }
+
+    // Event listeners
+    prevBtn.addEventListener('click', handlePrev);
+    nextBtn.addEventListener('click', handleNext);
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => handleDotClick(index));
+    });
+
+    window.addEventListener('resize', updateCarousel);
+
+    // Initialize
+    updateCarousel();
+    startAutoProgress();
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (autoProgressTimer) clearInterval(autoProgressTimer);
+    });
+  });
+</script>
+
+<style>
+  .line-clamp-4 {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

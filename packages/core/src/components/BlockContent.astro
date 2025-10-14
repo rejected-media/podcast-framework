@@ -1,0 +1,75 @@
+---
+/**
+ * Block Content Renderer
+ *
+ * Renders Sanity's portable text/block content
+ * Simple implementation for common block types (paragraphs, headings, lists, etc.)
+ *
+ * @component
+ * @example
+ * ```astro
+ * import BlockContent from '@podcast-framework/core/components/BlockContent.astro';
+ *
+ * <BlockContent
+ *   blocks={episode.showNotes}
+ *   class="prose max-w-none"
+ * />
+ * ```
+ */
+
+interface Props {
+  blocks?: any[];
+  class?: string;
+}
+
+const { blocks, class: className } = Astro.props;
+
+if (!blocks || blocks.length === 0) {
+  return null;
+}
+
+// Simple block content renderer
+function renderBlock(block: any): string {
+  if (block._type === 'block') {
+    const text = block.children?.map((child: any) => {
+      let content = child.text || '';
+
+      // Apply marks (bold, italic, etc.)
+      if (child.marks && child.marks.length > 0) {
+        child.marks.forEach((mark: string) => {
+          if (mark === 'strong') content = `<strong>${content}</strong>`;
+          if (mark === 'em') content = `<em>${content}</em>`;
+          if (mark === 'code') content = `<code class="bg-gray-100 px-1 py-0.5 rounded">${content}</code>`;
+          if (mark === 'underline') content = `<u>${content}</u>`;
+        });
+      }
+
+      return content;
+    }).join('') || '';
+
+    // Render block based on style
+    const style = block.style || 'normal';
+
+    if (style === 'h1') return `<h1 class="text-3xl font-bold mb-4">${text}</h1>`;
+    if (style === 'h2') return `<h2 class="text-2xl font-bold mb-3">${text}</h2>`;
+    if (style === 'h3') return `<h3 class="text-xl font-semibold mb-2">${text}</h3>`;
+    if (style === 'h4') return `<h4 class="text-lg font-semibold mb-2">${text}</h4>`;
+    if (style === 'h5') return `<h5 class="font-semibold mb-2">${text}</h5>`;
+    if (style === 'h6') return `<h6 class="font-semibold mb-2 text-sm">${text}</h6>`;
+    if (style === 'blockquote') return `<blockquote class="border-l-4 border-gray-300 pl-4 italic my-4">${text}</blockquote>`;
+
+    return `<p class="text-lg text-gray-700 leading-relaxed mb-6">${text}</p>`;
+  }
+
+  // Handle lists (future enhancement)
+  if (block._type === 'list') {
+    return `<!-- List rendering not yet implemented -->`;
+  }
+
+  return '';
+}
+
+const renderedContent = blocks.map(renderBlock).join('');
+---
+
+<div class:list={[className, "prose max-w-none"]} set:html={renderedContent} />

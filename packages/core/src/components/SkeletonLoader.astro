@@ -1,0 +1,127 @@
+---
+/**
+ * Skeleton Loader
+ *
+ * Loading placeholder UI while content is being fetched
+ * Useful for client-side data loading or SSR with suspense
+ *
+ * @component
+ * @example
+ * ```astro
+ * import SkeletonLoader from '@podcast-framework/core/components/SkeletonLoader.astro';
+ *
+ * <SkeletonLoader variant="episode-card" count={3} />
+ * ```
+ */
+
+interface Props {
+  variant?: 'episode-card' | 'episode-list' | 'carousel' | 'guest-card';
+  count?: number;
+}
+
+const { variant = 'episode-card', count = 1 } = Astro.props;
+---
+
+{variant === 'episode-card' && (
+  <>
+    {Array.from({ length: count }).map(() => (
+      <div class="bg-white rounded-lg shadow-md p-6 animate-pulse">
+        <!-- Image skeleton -->
+        <div class="w-full h-48 bg-gray-200 rounded-lg mb-4"></div>
+
+        <!-- Episode number -->
+        <div class="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+
+        <!-- Title -->
+        <div class="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+
+        <!-- Date -->
+        <div class="h-4 bg-gray-200 rounded w-32 mb-4"></div>
+
+        <!-- Description -->
+        <div class="space-y-2">
+          <div class="h-4 bg-gray-200 rounded"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+        </div>
+      </div>
+    ))}
+  </>
+)}
+
+{variant === 'carousel' && (
+  <div class="bg-white rounded-lg shadow-md p-6 animate-pulse">
+    <div class="flex flex-col md:flex-row gap-6">
+      <!-- Image skeleton -->
+      <div class="flex-shrink-0 w-full md:w-64 h-64 bg-gray-200 rounded-lg"></div>
+
+      <!-- Content skeleton -->
+      <div class="flex-grow space-y-4">
+        <!-- Episode number -->
+        <div class="h-4 bg-gray-200 rounded w-24"></div>
+
+        <!-- Title -->
+        <div class="h-6 bg-gray-200 rounded w-3/4"></div>
+
+        <!-- Host and guests -->
+        <div class="space-y-2">
+          <div class="h-4 bg-gray-200 rounded w-48"></div>
+          <div class="h-4 bg-gray-200 rounded w-56"></div>
+        </div>
+
+        <!-- Description -->
+        <div class="space-y-2">
+          <div class="h-4 bg-gray-200 rounded"></div>
+          <div class="h-4 bg-gray-200 rounded"></div>
+          <div class="h-4 bg-gray-200 rounded w-4/5"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{variant === 'episode-list' && (
+  <>
+    {Array.from({ length: count }).map(() => (
+      <div class="flex gap-4 p-4 border-b border-gray-200 animate-pulse">
+        <!-- Small image -->
+        <div class="flex-shrink-0 w-20 h-20 bg-gray-200 rounded"></div>
+
+        <!-- Content -->
+        <div class="flex-grow space-y-2">
+          <div class="h-5 bg-gray-200 rounded w-2/3"></div>
+          <div class="h-4 bg-gray-200 rounded w-32"></div>
+          <div class="h-4 bg-gray-200 rounded w-full"></div>
+        </div>
+      </div>
+    ))}
+  </>
+)}
+
+{variant === 'guest-card' && (
+  <>
+    {Array.from({ length: count }).map(() => (
+      <div class="text-center animate-pulse">
+        <!-- Photo skeleton -->
+        <div class="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-4"></div>
+
+        <!-- Name -->
+        <div class="h-5 bg-gray-200 rounded w-24 mx-auto"></div>
+      </div>
+    ))}
+  </>
+)}
+
+<style>
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+</style>

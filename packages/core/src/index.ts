@@ -38,12 +38,15 @@ export type {
 } from './lib/types';
 
 /**
- * Available Components:
- * - Header.astro - Main navigation header
- * - Footer.astro - Site footer with social links
- * - NewsletterSignup.astro - Email subscription form
- * - EpisodeSearch.astro - Client-side episode search
- * - TranscriptViewer.astro - Collapsible transcript with search
+ * Available Components (8):
+ * - Header.astro - Main navigation header with mobile menu
+ * - Footer.astro - Site footer with social links and newsletter slot
+ * - NewsletterSignup.astro - Email subscription form with spam protection
+ * - EpisodeSearch.astro - Client-side episode search with fuzzy matching
+ * - TranscriptViewer.astro - Collapsible transcript viewer with search
+ * - FeaturedEpisodesCarousel.astro - Auto-progressing episode carousel
+ * - SkeletonLoader.astro - Loading placeholder UI (4 variants)
+ * - BlockContent.astro - Sanity portable text renderer
  *
  * Usage Examples:
  *
