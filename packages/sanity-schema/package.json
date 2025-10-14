@@ -1,0 +1,41 @@
+{
+  "name": "@podcast-framework/sanity-schema",
+  "version": "1.0.0",
+  "description": "Base Sanity schemas for podcast framework with extension support",
+  "author": "Rex Kirshner",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schemas/*": "./src/schemas/*",
+    "./migrations/*": "./src/migrations/*"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "sanity": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "sanity": "^3.0.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
+  },
+  "keywords": [
+    "podcast",
+    "sanity",
+    "cms",
+    "schema"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/podcast-framework/podcast-framework.git",
+    "directory": "packages/sanity-schema"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "podcast-framework-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Monorepo for podcast framework packages",
+  "author": "Rex Kirshner",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "dev:core": "npm run dev --workspace=packages/core",
+    "build:core": "npm run build --workspace=packages/core",
+    "dev:cli": "npm run dev --workspace=packages/cli",
+    "build:packages": "npm run build --workspace=packages/core && npm run build --workspace=packages/cli && npm run build --workspace=packages/sanity-schema"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
