@@ -1,0 +1,21 @@
+{
+  "name": "podcast-example-basic",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Basic example podcast using @podcast-framework/core",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@podcast-framework/core": "file:../../packages/core",
+    "astro": "^5.1.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.0",
+    "typescript": "^5.3.3"
+  }
+}

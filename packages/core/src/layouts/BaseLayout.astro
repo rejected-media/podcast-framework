@@ -1,0 +1,165 @@
+---
+/**
+ * Base Layout
+ *
+ * Main layout with SEO, analytics, theme, and common components (Header/Footer)
+ *
+ * @layout
+ * @example
+ * ```astro
+ * ---
+ * import BaseLayout from '@podcast-framework/core/layouts/BaseLayout.astro';
+ * ---
+ *
+ * <BaseLayout
+ *   title="Page Title"
+ *   description="Page description for SEO"
+ *   ogImage="/custom-og-image.png"
+ * >
+ *   <h1>Page Content</h1>
+ * </BaseLayout>
+ * ```
+ */
+
+import type { Theme, PodcastInfo } from '../lib/types';
+import { defaultTheme, generateThemeCSS, getGoogleFontsURL } from '../lib/theme';
+import { getComponent } from '../lib/component-resolver';
+
+// Import framework Header/Footer (will be auto-resolved for overrides)
+const Header = getComponent('Header');
+const Footer = getComponent('Footer');
+
+export interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  podcastInfo?: PodcastInfo;
+  theme?: Theme;
+  gaId?: string;
+}
+
+const {
+  title,
+  description,
+  ogImage: propOgImage,
+  podcastInfo,
+  theme = defaultTheme,
+  gaId
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Default OG image
+const ogImage = propOgImage || podcastInfo?.logo?.url || '/og-default.png';
+const themeCSS = generateThemeCSS(theme);
+const googleFontsUrl = theme.typography.fontFamily?.includes('Google:')
+  ? getGoogleFontsURL([theme.typography.fontFamily])
+  : '';
+
+// Google Analytics from environment or props
+const GA_MEASUREMENT_ID = gaId || import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+
+// Prepare Header props
+const siteName = podcastInfo?.name || 'Podcast';
+const siteTagline = podcastInfo?.tagline;
+const logoUrl = podcastInfo?.logo?.url;
+const showContribute = podcastInfo?.isActive === true;
+
+// Navigation items
+const navigation = [
+  { href: '/', label: 'Home' },
+  { href: '/episodes', label: 'Episodes' },
+  { href: '/guests', label: 'Guests' },
+  { href: '/contribute', label: 'Contribute', show: showContribute },
+  { href: '/about', label: 'About' }
+];
+
+// Footer social links
+const socialLinks = [
+  podcastInfo?.spotifyUrl && { href: podcastInfo.spotifyUrl, label: 'Spotify' },
+  podcastInfo?.applePodcastsUrl && { href: podcastInfo.applePodcastsUrl, label: 'Apple Podcasts' },
+  podcastInfo?.rssUrl && { href: podcastInfo.rssUrl, label: 'RSS Feed' }
+].filter(Boolean) as Array<{ href: string; label: string }>;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Google Fonts -->
+    {googleFontsUrl && <link rel="preconnect" href="https://fonts.googleapis.com" />}
+    {googleFontsUrl && <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />}
+    {googleFontsUrl && <link href={googleFontsUrl} rel="stylesheet" />}
+
+    <!-- Theme CSS Variables -->
+    <style is:inline set:html={themeCSS}></style>
+
+    <!-- Primary Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(ogImage, Astro.site)} />
+
+    <!-- Google Analytics 4 -->
+    {GA_MEASUREMENT_ID && (
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}></script>
+    )}
+    {GA_MEASUREMENT_ID && (
+      <script is:inline define:vars={{ GA_MEASUREMENT_ID }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', GA_MEASUREMENT_ID);
+      </script>
+    )}
+
+    <!-- Additional head content slot -->
+    <slot name="head" />
+  </head>
+
+  <body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
+    <!-- Allow header override via slot -->
+    <slot name="header">
+      <Header
+        siteName={siteName}
+        siteTagline={siteTagline}
+        logoUrl={logoUrl}
+        navigation={navigation}
+        theme={theme}
+      />
+    </slot>
+
+    <!-- Main content -->
+    <slot />
+
+    <!-- Allow footer override via slot -->
+    <slot name="footer">
+      <Footer
+        siteName={siteName}
+        siteDescription={podcastInfo?.description}
+        navigation={navigation}
+        socialLinks={socialLinks}
+        theme={theme}
+        showNewsletter={podcastInfo?.isActive}
+      />
+    </slot>
+  </body>
+</html>
