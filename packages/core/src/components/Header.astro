@@ -1,0 +1,205 @@
+---
+/**
+ * Header Component
+ *
+ * Main navigation header with logo, site name, and responsive menu
+ *
+ * @component
+ * @example
+ * ```astro
+ * import Header from '@podcast-framework/core/components/Header.astro';
+ *
+ * <Header
+ *   siteName="My Podcast"
+ *   siteTagline="Great conversations"
+ *   logoUrl="/logo.png"
+ *   navigation={[
+ *     { href: '/', label: 'Home' },
+ *     { href: '/episodes', label: 'Episodes' }
+ *   ]}
+ * />
+ * ```
+ */
+
+import type { Theme } from '../lib/types';
+import { defaultTheme } from '../lib/theme';
+
+export interface NavigationItem {
+  href: string;
+  label: string;
+  show?: boolean; // Optional conditional rendering
+}
+
+export interface Props {
+  siteName: string;
+  siteTagline?: string;
+  logoUrl?: string;
+  navigation?: NavigationItem[];
+  theme?: Theme;
+}
+
+const {
+  siteName,
+  siteTagline,
+  logoUrl,
+  navigation = [
+    { href: '/', label: 'Home' },
+    { href: '/episodes', label: 'Episodes' },
+    { href: '/guests', label: 'Guests' },
+    { href: '/about', label: 'About' }
+  ],
+  theme = defaultTheme
+} = Astro.props;
+
+// Filter navigation items (allow conditional rendering via show property)
+const visibleNav = navigation.filter(item => item.show !== false);
+---
+
+<header
+  style="background: var(--color-header-bg);"
+  class="border-b"
+  style:border-color={`rgba(${theme.colors.primary}, 0.2)`}
+>
+  <div class="max-w-6xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between">
+      <!-- Logo/Brand -->
+      <div>
+        <a href="/" class="flex items-center gap-3">
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt={siteName}
+              class="w-10 h-10 rounded-lg object-cover"
+            />
+          ) : (
+            <div
+              style="background: var(--color-primary);"
+              class={`w-10 h-10 ${theme.layout.borderRadius} flex items-center justify-center`}
+            >
+              <span class="text-white font-bold text-xl">
+                {siteName.substring(0, 2).toUpperCase()}
+              </span>
+            </div>
+          )}
+          <div>
+            <h1 class="text-xl font-bold" style="color: var(--color-header-text);">
+              {siteName}
+            </h1>
+            {siteTagline && (
+              <p class="text-xs" style="color: var(--color-secondary);">
+                {siteTagline}
+              </p>
+            )}
+          </div>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex gap-6">
+        {visibleNav.map((item) => (
+          <a
+            href={item.href}
+            style="color: var(--color-secondary);"
+            class="font-semibold hover:opacity-75 transition"
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
+
+      <!-- Mobile Menu Button -->
+      <button
+        id="mobile-menu-button"
+        style="color: var(--color-header-text);"
+        class="md:hidden p-2 hover:opacity-75 transition"
+        aria-label="Toggle mobile menu"
+        aria-expanded="false"
+      >
+        <svg
+          id="menu-icon"
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          ></path>
+        </svg>
+        <svg
+          id="close-icon"
+          class="w-6 h-6 hidden"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Panel -->
+    <nav
+      id="mobile-menu"
+      class="md:hidden hidden border-t py-4"
+      style:border-color={`rgba(${theme.colors.primary}, 0.2)`}
+    >
+      <div class="flex flex-col gap-4">
+        {visibleNav.map((item) => (
+          <a
+            href={item.href}
+            style="color: var(--color-secondary);"
+            class={`font-semibold hover:opacity-75 transition px-2 py-2 ${theme.layout.borderRadius}`}
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  // Mobile menu toggle functionality
+  const menuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  menuButton?.addEventListener('click', () => {
+    const isOpen = !mobileMenu?.classList.contains('hidden');
+
+    if (isOpen) {
+      // Close menu
+      mobileMenu?.classList.add('hidden');
+      menuIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('hidden');
+      menuButton?.setAttribute('aria-expanded', 'false');
+    } else {
+      // Open menu
+      mobileMenu?.classList.remove('hidden');
+      menuIcon?.classList.add('hidden');
+      closeIcon?.classList.remove('hidden');
+      menuButton?.setAttribute('aria-expanded', 'true');
+    }
+  });
+
+  // Close mobile menu when clicking a link
+  const mobileMenuLinks = mobileMenu?.querySelectorAll('a');
+  mobileMenuLinks?.forEach((link) => {
+    link.addEventListener('click', () => {
+      mobileMenu?.classList.add('hidden');
+      menuIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('hidden');
+      menuButton?.setAttribute('aria-expanded', 'false');
+    });
+  });
+</script>
