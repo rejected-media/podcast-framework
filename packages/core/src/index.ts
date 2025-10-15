@@ -47,6 +47,12 @@ export {
   getFeaturedEpisodes as getFeatured
 } from './lib/sanity-helpers';
 
+// Static path helpers (eliminates getStaticPaths boilerplate)
+export {
+  getStaticPathsForEpisodes,
+  getStaticPathsForGuests
+} from './lib/static-paths';
+
 // Hosting platform adapter
 export {
   detectPlatform,
