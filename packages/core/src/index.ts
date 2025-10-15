@@ -25,7 +25,7 @@ export {
 // Theme utilities
 export { defaultTheme, generateThemeCSS, getGoogleFontsURL, mergeTheme } from './lib/theme';
 
-// Sanity CMS utilities
+// Sanity CMS utilities (low-level)
 export {
   createSanityClient,
   cachedFetch,
@@ -36,6 +36,16 @@ export {
   getAllGuests,
   getGuestBySlug
 } from './lib/sanity';
+
+// Sanity helpers (auto-configured - recommended for most users)
+export {
+  getEpisodes,
+  getEpisode,
+  getGuests,
+  getGuest,
+  getPodcast,
+  getFeaturedEpisodes as getFeatured
+} from './lib/sanity-helpers';
 
 // Hosting platform adapter
 export {
