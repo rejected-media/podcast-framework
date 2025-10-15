@@ -19,7 +19,7 @@ Be respectful, inclusive, and constructive. We're building this together!
 
 ```bash
 # Clone the repository
-git clone https://github.com/podcast-framework/podcast-framework.git
+git clone https://github.com/rejected-media/podcast-framework.git
 cd podcast-framework
 
 # Install dependencies

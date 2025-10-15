@@ -74,6 +74,7 @@ export interface Guest {
   twitter?: string;
   website?: string;
   linkedin?: string;
+  episodes?: Episode[];
 }
 
 /**
@@ -108,6 +109,10 @@ export interface PodcastInfo {
   rssUrl?: string;
   spotifyShowId?: string;
   applePodcastsUrl?: string;
+  spotifyUrl?: string;
+  youtubeUrl?: string;
+  twitterHandle?: string;
+  twitterUrl?: string;
 }
 
 /**

@@ -51,8 +51,10 @@ const {
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-// Default OG image
-const ogImage = propOgImage || podcastInfo?.logo?.url || '/og-default.png';
+// Default OG image fallback (simple data URI with podcast branding)
+// This ensures OG tags always have a valid image even if no custom image is set
+const DEFAULT_OG_IMAGE = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'%3E%3Crect fill='%2300a3b5' width='1200' height='630'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui,-apple-system,sans-serif' font-size='96' font-weight='bold' fill='white'%3EPodcast%3C/text%3E%3C/svg%3E`;
+const ogImage = propOgImage || podcastInfo?.logo?.url || DEFAULT_OG_IMAGE;
 const themeCSS = generateThemeCSS(theme);
 const googleFontsUrl = theme.typography.fontFamily?.includes('Google:')
   ? getGoogleFontsURL([theme.typography.fontFamily])
@@ -122,6 +124,12 @@ const socialLinks = [
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={new URL(ogImage, Astro.site)} />
+    {podcastInfo?.twitterHandle && (
+      <meta property="twitter:site" content={`@${podcastInfo.twitterHandle}`} />
+    )}
+    {podcastInfo?.twitterHandle && (
+      <meta property="twitter:creator" content={`@${podcastInfo.twitterHandle}`} />
+    )}
 
     <!-- Google Analytics 4 -->
     {GA_MEASUREMENT_ID && (

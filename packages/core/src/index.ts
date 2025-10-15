@@ -63,9 +63,14 @@ export {
   getRequiredEnv,
   getClientIP,
   getPlatformInfo,
-  logError
+  logError,
+  getCorsHeaders,
+  validateOrigin,
+  checkRateLimit,
+  getRateLimitInfo,
+  clearRateLimit
 } from './lib/hosting-adapter';
-export type { HostingPlatform } from './lib/hosting-adapter';
+export type { HostingPlatform, CorsOptions, RateLimitOptions } from './lib/hosting-adapter';
 
 // Server services (for API routes/serverless functions)
 export { ContributionService } from './server/services/contribution-service';

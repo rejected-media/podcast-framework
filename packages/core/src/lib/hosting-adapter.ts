@@ -256,3 +256,270 @@ export function logError(
     // Sentry not available - that's fine
   }
 }
+
+/**
+ * CORS Headers Configuration
+ */
+export interface CorsOptions {
+  allowedOrigins: string[];
+  allowedMethods?: string[];
+  allowedHeaders?: string[];
+  credentials?: boolean;
+  maxAge?: number;
+}
+
+/**
+ * Validate if origin is in allowed list
+ *
+ * @param origin - Request origin from headers
+ * @param allowedOrigins - Array of allowed origins
+ * @returns True if origin is allowed
+ *
+ * @example
+ * ```typescript
+ * const isAllowed = validateOrigin(
+ *   request.headers.get('origin'),
+ *   ['https://yourpodcast.com', 'http://localhost:4321']
+ * );
+ * ```
+ */
+export function validateOrigin(
+  origin: string | null,
+  allowedOrigins: string[]
+): boolean {
+  if (!origin) return false;
+  return allowedOrigins.includes(origin);
+}
+
+/**
+ * Get CORS headers with origin validation
+ *
+ * Implements secure CORS by validating the request origin against an allowlist.
+ * Falls back to the first allowed origin if the request origin is not allowed.
+ *
+ * @param requestOrigin - Origin from request headers
+ * @param options - CORS configuration options
+ * @returns CORS headers object
+ *
+ * @example
+ * ```typescript
+ * import { getCorsHeaders } from '@podcast-framework/core';
+ *
+ * export const POST: APIRoute = async ({ request }) => {
+ *   const origin = request.headers.get('origin');
+ *   const corsHeaders = getCorsHeaders(origin, {
+ *     allowedOrigins: [
+ *       'https://yourpodcast.com',
+ *       'http://localhost:4321'
+ *     ],
+ *     allowedMethods: ['POST', 'OPTIONS'],
+ *     credentials: true
+ *   });
+ *
+ *   return new Response(JSON.stringify({ success: true }), {
+ *     headers: corsHeaders
+ *   });
+ * };
+ * ```
+ *
+ * @security
+ * - Never use "*" for Access-Control-Allow-Origin in production
+ * - Always validate against an explicit allowlist
+ * - Be careful with credentials: true (requires specific origin)
+ */
+export function getCorsHeaders(
+  requestOrigin: string | null,
+  options: CorsOptions
+): Record<string, string> {
+  const {
+    allowedOrigins,
+    allowedMethods = ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders = ['Content-Type'],
+    credentials = false,
+    maxAge = 86400, // 24 hours
+  } = options;
+
+  // Validate origin against allowlist
+  const isAllowed = validateOrigin(requestOrigin, allowedOrigins);
+  const origin = isAllowed && requestOrigin ? requestOrigin : allowedOrigins[0];
+
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': allowedMethods.join(', '),
+    'Access-Control-Allow-Headers': allowedHeaders.join(', '),
+    'Access-Control-Max-Age': maxAge.toString(),
+  };
+
+  // Only set credentials if explicitly enabled
+  if (credentials) {
+    headers['Access-Control-Allow-Credentials'] = 'true';
+  }
+
+  return headers;
+}
+
+/**
+ * Rate Limiting Store
+ */
+interface RateLimitRecord {
+  count: number;
+  resetAt: number;
+}
+
+/**
+ * In-memory rate limit store
+ *
+ * LIMITATION: Resets on serverless cold starts. For production scale,
+ * consider using Redis (Upstash), Cloudflare KV, or other persistent storage.
+ */
+const rateLimitStore = new Map<string, RateLimitRecord>();
+
+/**
+ * Rate Limiting Options
+ */
+export interface RateLimitOptions {
+  maxRequests: number;
+  windowMs: number;
+  keyPrefix?: string;
+}
+
+/**
+ * Check if request is rate limited
+ *
+ * Implements sliding window rate limiting using in-memory storage.
+ * For production scale, replace with Redis or other distributed storage.
+ *
+ * @param identifier - Unique identifier (IP address, user ID, API key, etc.)
+ * @param options - Rate limit configuration
+ * @returns True if request is allowed, false if rate limited
+ *
+ * @example
+ * ```typescript
+ * import { checkRateLimit, getClientIP } from '@podcast-framework/core';
+ *
+ * export const POST: APIRoute = async (context) => {
+ *   const clientIP = getClientIP(context);
+ *
+ *   const isAllowed = checkRateLimit(clientIP, {
+ *     maxRequests: 10,
+ *     windowMs: 60000 // 10 requests per minute
+ *   });
+ *
+ *   if (!isAllowed) {
+ *     return new Response('Too Many Requests', { status: 429 });
+ *   }
+ *
+ *   // Process request...
+ * };
+ * ```
+ *
+ * @limitations
+ * - In-memory storage resets on serverless cold starts
+ * - Not shared across multiple function instances
+ * - For production, use Redis (Upstash), Cloudflare Durable Objects, or similar
+ */
+export function checkRateLimit(
+  identifier: string,
+  options: RateLimitOptions
+): boolean {
+  const { maxRequests, windowMs, keyPrefix = 'ratelimit' } = options;
+  const key = `${keyPrefix}:${identifier}`;
+  const now = Date.now();
+
+  // Get or create record
+  const record = rateLimitStore.get(key);
+
+  // No record or window expired - allow and create new record
+  if (!record || now > record.resetAt) {
+    rateLimitStore.set(key, {
+      count: 1,
+      resetAt: now + windowMs,
+    });
+    return true;
+  }
+
+  // Within window - check count
+  if (record.count >= maxRequests) {
+    return false; // Rate limited
+  }
+
+  // Increment count and allow
+  record.count++;
+  return true;
+}
+
+/**
+ * Get rate limit info for identifier
+ *
+ * @param identifier - Unique identifier
+ * @param options - Rate limit configuration (for key generation)
+ * @returns Rate limit status information
+ *
+ * @example
+ * ```typescript
+ * const info = getRateLimitInfo(clientIP, {
+ *   maxRequests: 10,
+ *   windowMs: 60000
+ * });
+ *
+ * return new Response(null, {
+ *   headers: {
+ *     'X-RateLimit-Limit': info.limit.toString(),
+ *     'X-RateLimit-Remaining': info.remaining.toString(),
+ *     'X-RateLimit-Reset': info.reset.toString()
+ *   }
+ * });
+ * ```
+ */
+export function getRateLimitInfo(
+  identifier: string,
+  options: RateLimitOptions
+): {
+  limit: number;
+  remaining: number;
+  reset: number;
+  resetDate: Date;
+} {
+  const { maxRequests, windowMs, keyPrefix = 'ratelimit' } = options;
+  const key = `${keyPrefix}:${identifier}`;
+  const now = Date.now();
+
+  const record = rateLimitStore.get(key);
+
+  if (!record || now > record.resetAt) {
+    return {
+      limit: maxRequests,
+      remaining: maxRequests,
+      reset: now + windowMs,
+      resetDate: new Date(now + windowMs),
+    };
+  }
+
+  return {
+    limit: maxRequests,
+    remaining: Math.max(0, maxRequests - record.count),
+    reset: record.resetAt,
+    resetDate: new Date(record.resetAt),
+  };
+}
+
+/**
+ * Clear rate limit for identifier (useful for testing or admin override)
+ *
+ * @param identifier - Unique identifier
+ * @param options - Rate limit configuration (for key generation)
+ *
+ * @example
+ * ```typescript
+ * // Admin endpoint to reset rate limit
+ * clearRateLimit(userId, { maxRequests: 10, windowMs: 60000 });
+ * ```
+ */
+export function clearRateLimit(
+  identifier: string,
+  options: Pick<RateLimitOptions, 'keyPrefix'>
+): void {
+  const { keyPrefix = 'ratelimit' } = options;
+  const key = `${keyPrefix}:${identifier}`;
+  rateLimitStore.delete(key);
+}

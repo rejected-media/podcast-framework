@@ -9,11 +9,12 @@
  * 2. Set SENTRY_DSN environment variable
  * 3. Call initSentry() in your entry point (e.g., middleware or API route)
  * 4. Use captureException() and captureMessage() to report errors
+ *
+ * NOTE: Sentry is optional. If not installed, functions gracefully degrade to console logging.
  */
 
-import * as Sentry from '@sentry/node';
-
 let sentryInitialized = false;
+let Sentry: any = null;
 
 export interface SentryConfig {
   /** Sentry DSN (Data Source Name) from your Sentry project */
@@ -38,15 +39,37 @@ export interface SentryContext {
 }
 
 /**
+ * Load Sentry dynamically if available
+ */
+async function loadSentry(): Promise<boolean> {
+  if (Sentry) return true;
+
+  try {
+    // @ts-ignore - Optional dependency
+    Sentry = await import('@sentry/node');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Initialize Sentry for server-side error tracking
  *
  * @param config - Sentry configuration options
  * @returns true if initialized successfully, false otherwise
  */
-export function initSentry(config?: SentryConfig): boolean {
+export async function initSentry(config?: SentryConfig): Promise<boolean> {
   // Only initialize once
   if (sentryInitialized) {
     return true;
+  }
+
+  // Try to load Sentry
+  const loaded = await loadSentry();
+  if (!loaded) {
+    console.log('Sentry: Package not installed. Error monitoring disabled.');
+    return false;
   }
 
   // Determine if production
@@ -81,7 +104,7 @@ export function initSentry(config?: SentryConfig): boolean {
         'Network request failed',
       ],
 
-      beforeSend(event, hint) {
+      beforeSend(event: any, hint: any) {
         // Filter out low-value errors
         const error = hint.originalException;
 
@@ -126,13 +149,13 @@ export function isSentryInitialized(): boolean {
  * @param context - Additional context (tags, extra data, level)
  */
 export function captureException(error: unknown, context?: SentryContext): void {
-  if (!sentryInitialized) {
+  if (!sentryInitialized || !Sentry) {
     // Fallback to console if Sentry not initialized
     console.error('Error:', error, context);
     return;
   }
 
-  Sentry.withScope((scope) => {
+  Sentry.withScope((scope: any) => {
     if (context?.tags) {
       Object.entries(context.tags).forEach(([key, value]) => {
         scope.setTag(key, value);
@@ -163,7 +186,7 @@ export function captureMessage(
   message: string,
   level: 'fatal' | 'error' | 'warning' | 'info' | 'debug' = 'info'
 ): void {
-  if (!sentryInitialized) {
+  if (!sentryInitialized || !Sentry) {
     console.log(`[${level}]`, message);
     return;
   }

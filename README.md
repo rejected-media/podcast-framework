@@ -107,7 +107,7 @@ npm run deploy
 
 ```bash
 # Clone repository
-git clone https://github.com/podcast-framework/podcast-framework.git
+git clone https://github.com/rejected-media/podcast-framework.git
 cd podcast-framework
 
 # Install dependencies

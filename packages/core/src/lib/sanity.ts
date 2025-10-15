@@ -312,6 +312,7 @@ export async function getPodcastInfo(
       applePodcastsUrl,
       spotifyUrl,
       rssUrl,
+      twitterHandle,
       twitterUrl,
       discordUrl
     }`;

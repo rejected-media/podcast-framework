@@ -86,6 +86,23 @@ export const basePodcastSchema = defineType({
 
     // Social
     defineField({
+      name: 'twitterHandle',
+      title: 'Twitter/X Handle',
+      type: 'string',
+      description: 'Twitter handle (without @) for social meta tags - e.g., "yourpodcast"',
+      placeholder: 'yourpodcast',
+      validation: (Rule) => Rule.custom((handle: string | undefined) => {
+        if (!handle) return true; // Optional field
+        if (handle.startsWith('@')) {
+          return 'Do not include the @ symbol';
+        }
+        if (!/^[A-Za-z0-9_]{1,15}$/.test(handle)) {
+          return 'Must be 1-15 characters (letters, numbers, underscore only)';
+        }
+        return true;
+      }),
+    }),
+    defineField({
       name: 'twitterUrl',
       title: 'Twitter/X URL',
       type: 'url',

@@ -275,7 +275,7 @@ npm run build
 
 ## Documentation
 
-- Framework Docs: https://github.com/podcast-framework/podcast-framework
+- Framework Docs: https://github.com/rejected-media/podcast-framework
 - Component Reference: @podcast-framework/core/COMPONENTS.md
 
 ## License
