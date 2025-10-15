@@ -295,11 +295,11 @@ export async function getFeaturedEpisodes(
  * Fetch podcast metadata
  *
  * @param client - Sanity client
- * @returns Podcast info or null if not found
+ * @returns Podcast info or undefined if not found
  */
 export async function getPodcastInfo(
   client: SanityClient
-): Promise<PodcastInfo | null> {
+): Promise<PodcastInfo | undefined> {
   return cachedFetch('podcast-info', async () => {
     const query = `*[_type == "podcast"][0] {
       _id,
@@ -321,13 +321,13 @@ export async function getPodcastInfo(
 
       if (!podcast) {
         console.warn('No podcast document found in Sanity CMS.');
-        return null;
+        return undefined;
       }
 
       return podcast;
     } catch (error) {
       console.error('Failed to fetch podcast info from Sanity:', error);
-      return null;
+      return undefined;
     }
   });
 }
