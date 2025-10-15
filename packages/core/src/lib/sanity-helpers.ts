@@ -16,7 +16,7 @@
  * ```
  */
 
-import { createSanityClient, getAllEpisodes, getEpisodeBySlug, getAllGuests, getGuestBySlug, getPodcastInfo } from './sanity';
+import { createSanityClient, getAllEpisodes, getEpisodeBySlug, getAllGuests, getGuestBySlug, getPodcastInfo, getFeaturedEpisodes as getFeaturedEpisodesCore } from './sanity';
 import type { SanityClient } from '@sanity/client';
 
 // Global client cache (created once per build)
@@ -90,6 +90,5 @@ export async function getPodcast() {
  * Get featured episodes (auto-configured)
  */
 export async function getFeaturedEpisodes(limit?: number) {
-  const { getFeaturedEpisodes } = await import('./sanity');
-  return getFeaturedEpisodes(getClient(), limit);
+  return getFeaturedEpisodesCore(getClient(), limit);
 }
