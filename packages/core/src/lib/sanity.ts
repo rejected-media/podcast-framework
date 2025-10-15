@@ -383,7 +383,17 @@ export async function getGuestBySlug(
       "photo": photo.asset->{url},
       twitter,
       website,
-      linkedin
+      linkedin,
+      "episodes": *[_type == "episode" && references(^._id)] | order(episodeNumber desc) {
+        _id,
+        title,
+        slug,
+        episodeNumber,
+        publishDate,
+        duration,
+        description,
+        "coverImage": coverImage.asset->{url}
+      }
     }`;
 
     try {
@@ -398,6 +408,98 @@ export async function getGuestBySlug(
     } catch (error) {
       console.error(`Failed to fetch guest with slug "${slug}" from Sanity:`, error);
       return null;
+    }
+  });
+}
+
+/**
+ * Fetch homepage configuration from Sanity
+ *
+ * @param client - Sanity client
+ * @returns Homepage config or undefined if not found
+ */
+export async function getHomepageConfig(
+  client: SanityClient
+): Promise<any | undefined> {
+  return cachedFetch('homepage-config', async () => {
+    const query = `*[_type == "homepageConfig" && isActive == true][0] {
+      _id,
+      title,
+      isActive,
+      hero,
+      featuredEpisodes,
+      recentEpisodes,
+      featuredGuests,
+      subscribe,
+      about,
+      newsletter,
+      customSections
+    }`;
+
+    try {
+      const config = await client.fetch(query);
+
+      if (!config) {
+        console.warn('No active homepage config found in Sanity CMS.');
+        return undefined;
+      }
+
+      return config;
+    } catch (error) {
+      console.error('Failed to fetch homepage config from Sanity:', error);
+      return undefined;
+    }
+  });
+}
+
+/**
+ * Fetch about page configuration from Sanity
+ *
+ * @param client - Sanity client
+ * @returns About page config or undefined if not found
+ */
+export async function getAboutPageConfig(
+  client: SanityClient
+): Promise<any | undefined> {
+  return cachedFetch('about-page-config', async () => {
+    const query = `*[_type == "aboutPageConfig" && isActive == true][0] {
+      _id,
+      title,
+      isActive,
+      aboutSection,
+      hostsSection {
+        enabled,
+        title,
+        layout,
+        "hosts": hosts[]-> {
+          _id,
+          name,
+          slug,
+          bio,
+          "photo": photo.asset->{url},
+          twitter,
+          website,
+          linkedin
+        }
+      },
+      missionSection,
+      subscribeCTA,
+      communitySection,
+      customSections
+    }`;
+
+    try {
+      const config = await client.fetch(query);
+
+      if (!config) {
+        console.warn('No active about page config found in Sanity CMS.');
+        return undefined;
+      }
+
+      return config;
+    } catch (error) {
+      console.error('Failed to fetch about page config from Sanity:', error);
+      return undefined;
     }
   });
 }

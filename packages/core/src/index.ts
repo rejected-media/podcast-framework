@@ -34,7 +34,9 @@ export {
   getFeaturedEpisodes,
   getPodcastInfo,
   getAllGuests,
-  getGuestBySlug
+  getGuestBySlug,
+  getHomepageConfig,
+  getAboutPageConfig
 } from './lib/sanity';
 
 // Sanity helpers (auto-configured - recommended for most users)
