@@ -146,16 +146,17 @@ npm run test
 
 - [x] **Week 0:** Prerequisites (NPM org, GitHub org, tokens) ✅
 - [x] **Week 1:** Core components extraction ✅ (8 components, resolver, theme)
-- [ ] **Week 2:** Complete utilities extraction 🔄 (Sanity, hosting adapter)
-- [ ] **Week 3:** Schema system
-- [ ] **Week 4-7:** CLI tool
-- [ ] **Week 8:** Template repository
+- [x] **Week 2:** Complete utilities extraction ✅ (Sanity, hosting adapter)
+- [x] **Week 3:** Schema system ✅ (5 schemas with extensions)
+- [x] **Week 4-7:** CLI tool ✅ (10 commands, 18 tests)
+- [ ] **Week 8:** Template repository 🔄
 - [ ] **Week 9-10:** Documentation site
 - [ ] **Week 11:** Testing & validation
 - [ ] **Week 12:** Launch preparation
 - [ ] **Week 13-14:** Beta launch
 
-**Current Week:** Week 2 (73% complete)
+**Current Week:** Week 7 Complete (CLI tool done!)
+**Progress:** 50% complete (7 of 14 weeks)
 **Timeline:** On track for 12-14 week beta launch
 
 ---
