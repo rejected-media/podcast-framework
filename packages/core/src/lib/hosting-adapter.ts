@@ -191,9 +191,25 @@ export function getPlatformInfo(context?: APIContext) {
 /**
  * Platform-agnostic error logging
  *
+ * Logs to console and optionally sends to Sentry if initialized.
+ *
  * @param error - Error to log
- * @param context - Additional context data
+ * @param context - Additional context data (tags, extra)
  * @param apiContext - Astro API context
+ *
+ * @example
+ * ```typescript
+ * import { logError } from '@podcast-framework/core';
+ *
+ * try {
+ *   // ... some operation
+ * } catch (error) {
+ *   logError(error, {
+ *     tags: { function: 'newsletter-subscribe', operation: 'submit' },
+ *     extra: { email: userEmail }
+ *   }, context);
+ * }
+ * ```
  */
 export function logError(
   error: unknown,
@@ -211,12 +227,32 @@ export function logError(
     ...context,
   };
 
-  // Use platform-specific logging if available
+  // Console logging (always)
   if (platform === 'cloudflare' || platform === 'netlify') {
     // Cloudflare/Netlify: JSON structured logging
     console.error('[Error]', JSON.stringify(logData, null, 2));
   } else {
     // Default: object logging
     console.error('[Error]', logData);
+  }
+
+  // Sentry integration (optional, if initialized)
+  // Import dynamically to avoid errors if @sentry/node not installed
+  try {
+    // Try to import Sentry utilities
+    // This will only work if user has installed @sentry/node
+    import('../server/sentry').then(({ isSentryInitialized, captureException: sentryCaptureException }) => {
+      if (isSentryInitialized()) {
+        sentryCaptureException(error, {
+          tags: context?.tags,
+          extra: context?.extra,
+          level: context?.level || 'error',
+        });
+      }
+    }).catch(() => {
+      // Sentry not installed or initialized - that's fine, we already logged to console
+    });
+  } catch {
+    // Sentry not available - that's fine
   }
 }

@@ -33,16 +33,26 @@
   },
   "peerDependencies": {
     "@sanity/client": "^6.0.0",
+    "@sentry/astro": "^10.0.0",
+    "@sentry/node": "^10.0.0",
     "astro": "^5.0.0",
     "resend": "^4.0.0"
   },
   "peerDependenciesMeta": {
     "resend": {
       "optional": true
+    },
+    "@sentry/astro": {
+      "optional": true
+    },
+    "@sentry/node": {
+      "optional": true
     }
   },
   "devDependencies": {
     "@sanity/client": "^7.12.0",
+    "@sentry/astro": "^10.18.0",
+    "@sentry/node": "^10.18.0",
     "@types/node": "^20.10.0",
     "@typescript-eslint/eslint-plugin": "^8.46.1",
     "@typescript-eslint/parser": "^8.46.1",

@@ -81,6 +81,15 @@ export type {
   PodcastConfig as NewsletterPodcastConfig
 } from './server/services/newsletter-service';
 
+// Error tracking (Sentry)
+export {
+  initSentry,
+  isSentryInitialized,
+  captureException,
+  captureMessage
+} from './server/sentry';
+export type { SentryConfig, SentryContext } from './server/sentry';
+
 // Constants
 export { MAX_FIELD_LENGTHS, RATE_LIMIT_MAX_REQUESTS, RATE_LIMIT_WINDOW_MS, DEFAULT_LOCALE } from './lib/constants';
 
