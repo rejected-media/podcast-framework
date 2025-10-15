@@ -36,6 +36,7 @@ export interface Props {
   podcastInfo?: PodcastInfo;
   theme?: Theme;
   gaId?: string;
+  structuredData?: Record<string, any>;
 }
 
 const {
@@ -44,7 +45,8 @@ const {
   ogImage: propOgImage,
   podcastInfo,
   theme = defaultTheme,
-  gaId
+  gaId,
+  structuredData
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -90,6 +92,9 @@ const socialLinks = [
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
 
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com; frame-src 'self'; object-src 'none';" />
+
     <!-- Google Fonts -->
     {googleFontsUrl && <link rel="preconnect" href="https://fonts.googleapis.com" />}
     {googleFontsUrl && <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />}
@@ -129,6 +134,11 @@ const socialLinks = [
         gtag('js', new Date());
         gtag('config', GA_MEASUREMENT_ID);
       </script>
+    )}
+
+    <!-- Structured Data (JSON-LD) -->
+    {structuredData && (
+      <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     )}
 
     <!-- Additional head content slot -->
