@@ -45,9 +45,7 @@ export interface Episode {
   description: string;
   showNotes?: any[]; // Sanity block content
   coverImage?: {
-    asset?: {
-      url: string;
-    };
+    url: string;
   };
   guests?: Guest[];
   hosts?: Host[];
