@@ -65,6 +65,25 @@ export {
 } from './lib/hosting-adapter';
 export type { HostingPlatform } from './lib/hosting-adapter';
 
+// Server services (for API routes/serverless functions)
+export { ContributionService } from './server/services/contribution-service';
+export type {
+  ContributionRequest,
+  ContributionResult,
+  ContributionServiceConfig
+} from './server/services/contribution-service';
+
+export { NewsletterService } from './server/services/newsletter-service';
+export type {
+  NewsletterSubscribeRequest,
+  NewsletterSubscribeResult,
+  NewsletterServiceConfig,
+  PodcastConfig as NewsletterPodcastConfig
+} from './server/services/newsletter-service';
+
+// Constants
+export { MAX_FIELD_LENGTHS, RATE_LIMIT_MAX_REQUESTS, RATE_LIMIT_WINDOW_MS, DEFAULT_LOCALE } from './lib/constants';
+
 // TypeScript types
 export type {
   Episode,
