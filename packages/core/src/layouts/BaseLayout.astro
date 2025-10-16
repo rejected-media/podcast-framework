@@ -180,7 +180,7 @@ const socialLinks = [
         navigation={navigation}
         socialLinks={socialLinks}
         theme={theme}
-        showNewsletter={podcastInfo?.isActive}
+        showNewsletter={podcastInfo?.isActive && podcastInfo?.newsletterEnabled}
       />
     </slot>
   </body>
