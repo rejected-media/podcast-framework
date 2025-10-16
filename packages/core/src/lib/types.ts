@@ -108,6 +108,9 @@ export interface PodcastInfo {
   logo?: {
     url: string;
   };
+  favicon?: {
+    url: string;
+  };
   isActive: boolean;
   newsletterEnabled?: boolean;
   rssUrl?: string;

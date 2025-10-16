@@ -309,6 +309,7 @@ export async function getPodcastInfo(
       isActive,
       newsletterEnabled,
       "logo": logo.asset->{url},
+      "favicon": favicon.asset->{url},
       spotifyShowId,
       appleUrl,
       spotifyUrl,

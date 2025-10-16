@@ -55,6 +55,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 // This ensures OG tags always have a valid image even if no custom image is set
 const DEFAULT_OG_IMAGE = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'%3E%3Crect fill='%2300a3b5' width='1200' height='630'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui,-apple-system,sans-serif' font-size='96' font-weight='bold' fill='white'%3EPodcast%3C/text%3E%3C/svg%3E`;
 const ogImage = propOgImage || podcastInfo?.logo?.url || DEFAULT_OG_IMAGE;
+
+// Favicon from Sanity CMS or fallback to static files
+const faviconUrl = podcastInfo?.favicon?.url || '/favicon.svg';
+const faviconPngUrl = '/favicon.png';
 const themeCSS = generateThemeCSS(theme);
 const googleFontsUrl = theme.typography.fontFamily?.includes('Google:')
   ? getGoogleFontsURL([theme.typography.fontFamily])
@@ -94,8 +98,8 @@ const socialLinks = [
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="alternate icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/svg+xml" href={faviconUrl} />
+    <link rel="alternate icon" type="image/png" href={faviconPngUrl} />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
 
