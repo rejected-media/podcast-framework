@@ -26,6 +26,9 @@
 
 import type { Theme } from '../lib/types';
 import { defaultTheme } from '../lib/theme';
+import { getComponent } from '../lib/component-resolver';
+
+const NewsletterSignup = getComponent('NewsletterSignup');
 
 export interface SocialLink {
   href: string;
@@ -117,7 +120,7 @@ const visibleNav = navigation.filter(item => item.show !== false);
       )}
     </div>
 
-    <!-- Newsletter Signup Slot (optional) -->
+    <!-- Newsletter Signup (optional) -->
     {showNewsletter && (
       <div
         class="border-t pt-8 mb-8"
@@ -127,12 +130,7 @@ const visibleNav = navigation.filter(item => item.show !== false);
           <h4 class="font-semibold mb-4 text-center" style="color: rgb(var(--color-footer-text));">
             Get Episode Updates
           </h4>
-          <!-- Allow podcast to provide newsletter component via slot -->
-          <slot name="newsletter">
-            <p class="text-sm text-center opacity-75">
-              Newsletter signup component goes here
-            </p>
-          </slot>
+          <NewsletterSignup variant="footer" placeholder="Your email" buttonText="Subscribe" />
         </div>
       </div>
     )}
