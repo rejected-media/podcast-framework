@@ -92,9 +92,9 @@ if (!episodes || episodes.length === 0) {
         {episodes.map((episode, index) => (
           <a
             href={`/episodes/${episode.slug.current}`}
-            style="background: var(--color-surface);"
             class={`flex-shrink-0 w-full ${theme.layout.borderRadius} shadow-lg hover:shadow-2xl border border-opacity-30 hover:border-opacity-70 transition group`}
-            style:border-color={`rgb(var(--color-primary))`}
+            style:background="var(--color-surface)"
+            style:border-color="rgb(var(--color-primary))"
             role="listitem"
             aria-posinset={index + 1}
             aria-setsize={episodes.length}
@@ -119,11 +119,11 @@ if (!episodes || episodes.length === 0) {
                   />
                 ) : (
                   <div
-                    style="background: var(--color-surface);"
-                    class={`w-full md:w-64 h-64 ${theme.layout.borderRadius} flex items-center justify-center border`}
-                    style:border-color={`rgb(var(--color-primary))`}
+                    class={`w-full md:w-64 h-64 ${theme.layout.borderRadius} flex items-center justify-center border-2`}
+                    style:background="var(--color-surface)"
+                    style:border-color="rgb(var(--color-primary))"
                   >
-                    <span class="text-5xl font-bold" style="color: var(--color-primary);">
+                    <span class="text-5xl font-bold" style:color="rgb(var(--color-primary))">
                       {episode.episodeNumber}
                     </span>
                   </div>
@@ -132,7 +132,7 @@ if (!episodes || episodes.length === 0) {
 
               <!-- Episode Content -->
               <div class="flex-grow flex flex-col">
-                <p class="text-sm uppercase tracking-wide mb-2" style="color: var(--color-primary);">
+                <p class="text-sm uppercase tracking-wide mb-2" style:color="rgb(var(--color-primary))">
                   Episode {episode.episodeNumber}
                 </p>
                 <h3 class="text-2xl font-semibold group-hover:opacity-80 transition-opacity mb-4" style="color: var(--color-text);">
@@ -160,13 +160,15 @@ if (!episodes || episodes.length === 0) {
     </div>
 
     <!-- Dot indicators -->
-    <div class="flex justify-center gap-2 mt-6">
+    <div class="flex justify-center gap-2 mt-6" role="tablist" aria-label="Episode navigation">
       {episodes.map((_, index) => (
         <button
           class={`carousel-dot w-2 h-2 ${theme.layout.borderRadius} transition-all hover:opacity-100`}
-          style="background: var(--color-text); opacity: 0.3;"
+          style:background="rgb(var(--color-primary))"
+          style="opacity: 0.3;"
           data-index={index}
           aria-label={`Go to episode ${index + 1}`}
+          role="tab"
         />
       ))}
     </div>
