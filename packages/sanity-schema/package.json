@@ -1,5 +1,5 @@
 {
-  "name": "@podcast-framework/sanity-schema",
+  "name": "@rejected-media/podcast-framework-sanity-schema",
   "version": "1.0.0",
   "description": "Base Sanity schemas for podcast framework with extension support",
   "author": "Rex Kirshner",
