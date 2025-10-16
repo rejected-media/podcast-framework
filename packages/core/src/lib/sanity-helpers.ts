@@ -45,7 +45,7 @@ function getClient(): SanityClient {
     projectId,
     dataset,
     apiVersion: '2024-01-01',
-    useCdn: true
+    useCdn: false // Disabled in dev for fresh data
   });
 
   return globalClient;
