@@ -60,16 +60,16 @@ const currentYear = new Date().getFullYear();
 const visibleNav = navigation.filter(item => item.show !== false);
 ---
 
-<footer style="background: var(--color-footer-bg); color: var(--color-footer-text);" class="mt-16">
+<footer style="background: rgb(var(--color-footer-bg)); color: rgb(var(--color-footer-text));" class="mt-16">
   <div class="max-w-6xl mx-auto px-4 py-12">
     <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-12 mb-8">
       <!-- Brand Section -->
       <div class="max-w-md">
-        <h3 class="font-bold text-lg mb-4" style="color: var(--color-secondary);">
+        <h3 class="font-bold text-lg mb-4" style="color: rgb(var(--color-secondary));">
           {siteName}
         </h3>
         {siteDescription && (
-          <p class="text-sm leading-relaxed">
+          <p class="text-sm leading-relaxed" style="color: rgb(var(--color-footer-text));">
             {siteDescription}
           </p>
         )}
@@ -78,7 +78,7 @@ const visibleNav = navigation.filter(item => item.show !== false);
       <!-- Navigation Section -->
       {visibleNav.length > 0 && (
         <div>
-          <h4 class="font-semibold mb-4" style="color: var(--color-secondary);">
+          <h4 class="font-semibold mb-4" style="color: rgb(var(--color-secondary));">
             Navigation
           </h4>
           <ul class="space-y-2 text-sm">
@@ -96,7 +96,7 @@ const visibleNav = navigation.filter(item => item.show !== false);
       <!-- Subscribe/Social Links Section -->
       {socialLinks.length > 0 && (
         <div>
-          <h4 class="font-semibold mb-4" style="color: var(--color-secondary);">
+          <h4 class="font-semibold mb-4" style="color: rgb(var(--color-secondary));">
             Subscribe
           </h4>
           <ul class="space-y-2 text-sm">
@@ -124,7 +124,7 @@ const visibleNav = navigation.filter(item => item.show !== false);
         style:border-color={`rgba(${theme.colors.primary}, 0.2)`}
       >
         <div class="max-w-md mx-auto">
-          <h4 class="font-semibold mb-4 text-center" style="color: var(--color-secondary);">
+          <h4 class="font-semibold mb-4 text-center" style="color: rgb(var(--color-footer-text));">
             Get Episode Updates
           </h4>
           <!-- Allow podcast to provide newsletter component via slot -->
@@ -142,9 +142,9 @@ const visibleNav = navigation.filter(item => item.show !== false);
       class={`pt-8 text-center text-sm ${showNewsletter ? '' : 'border-t'}`}
       style:border-color={`rgba(${theme.colors.primary}, 0.2)`}
     >
-      <p>
+      <p style="color: rgb(var(--color-footer-text));">
         &copy; {currentYear}{' '}
-        <span style="color: var(--color-secondary);">{siteName}</span>. All rights reserved.
+        <span style="color: rgb(var(--color-secondary));">{siteName}</span>. All rights reserved.
       </p>
     </div>
   </div>

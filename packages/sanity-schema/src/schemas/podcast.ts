@@ -68,7 +68,7 @@ export const basePodcastSchema = defineType({
       type: 'url',
     }),
     defineField({
-      name: 'applePodcastsUrl',
+      name: 'appleUrl',
       title: 'Apple Podcasts URL',
       type: 'url',
     }),

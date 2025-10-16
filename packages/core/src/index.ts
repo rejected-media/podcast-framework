@@ -35,8 +35,7 @@ export {
   getPodcastInfo,
   getAllGuests,
   getGuestBySlug,
-  getHomepageConfig,
-  getAboutPageConfig
+  getTheme as getThemeFromSanity
 } from './lib/sanity';
 
 // Sanity helpers (auto-configured - recommended for most users)
@@ -46,7 +45,10 @@ export {
   getGuests,
   getGuest,
   getPodcast,
-  getFeaturedEpisodes as getFeatured
+  getFeaturedEpisodes as getFeatured,
+  getHomepageConfig,
+  getAboutPageConfig,
+  getTheme
 } from './lib/sanity-helpers';
 
 // Static path helpers (eliminates getStaticPaths boilerplate)
@@ -109,7 +111,9 @@ export type {
   PodcastInfo,
   NavigationItem,
   PodcastConfig,
-  TranscriptSegment
+  TranscriptSegment,
+  HomepageConfig,
+  AboutPageConfig
 } from './lib/types';
 
 /**

@@ -78,11 +78,15 @@ const navigation = [
   { href: '/about', label: 'About' }
 ];
 
-// Footer social links
+// Footer social links (support both appleUrl and applePodcastsUrl for backwards compatibility)
+const appleLink = podcastInfo?.appleUrl || podcastInfo?.applePodcastsUrl;
+const twitterLink = podcastInfo?.twitterUrl || (podcastInfo?.twitterHandle ? `https://twitter.com/${podcastInfo.twitterHandle}` : null);
 const socialLinks = [
   podcastInfo?.spotifyUrl && { href: podcastInfo.spotifyUrl, label: 'Spotify' },
-  podcastInfo?.applePodcastsUrl && { href: podcastInfo.applePodcastsUrl, label: 'Apple Podcasts' },
-  podcastInfo?.rssUrl && { href: podcastInfo.rssUrl, label: 'RSS Feed' }
+  appleLink && { href: appleLink, label: 'Apple Podcasts' },
+  podcastInfo?.youtubeUrl && { href: podcastInfo.youtubeUrl, label: 'YouTube' },
+  podcastInfo?.rssUrl && { href: podcastInfo.rssUrl, label: 'RSS Feed' },
+  twitterLink && { href: twitterLink, label: 'Twitter/X' }
 ].filter(Boolean) as Array<{ href: string; label: string }>;
 ---
 

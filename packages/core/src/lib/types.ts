@@ -13,7 +13,9 @@ export interface Theme {
     secondary: string;
     accent: string;
     background: string;
+    surface: string;
     text: string;
+    textMuted: string;
     headerBg: string;
     headerText: string;
     footerBg: string;
@@ -22,6 +24,7 @@ export interface Theme {
   typography: {
     fontFamily: string;
     headingFont?: string;
+    googleFonts?: string[];
   };
   layout: {
     borderRadius: string;  // Tailwind class e.g., "rounded-lg"
@@ -106,9 +109,11 @@ export interface PodcastInfo {
     url: string;
   };
   isActive: boolean;
+  newsletterEnabled?: boolean;
   rssUrl?: string;
   spotifyShowId?: string;
   applePodcastsUrl?: string;
+  appleUrl?: string; // Alias for applePodcastsUrl
   spotifyUrl?: string;
   youtubeUrl?: string;
   twitterHandle?: string;
@@ -176,4 +181,98 @@ export interface PodcastConfig {
     defaultImage?: string;
     twitterHandle?: string;
   };
+}
+
+/**
+ * Homepage Configuration
+ */
+export interface HomepageConfig {
+  _id: string;
+  title: string;
+  isActive: boolean;
+  hero?: {
+    enabled: boolean;
+    style?: string;
+    customHeadline?: string;
+    customDescription?: string;
+  };
+  featuredEpisodes?: {
+    enabled: boolean;
+    title: string;
+    autoplay: boolean;
+    interval: number;
+  };
+  recentEpisodes?: {
+    enabled: boolean;
+    title: string;
+    count: number;
+    layout: 'grid' | 'list';
+  };
+  featuredGuests?: {
+    enabled: boolean;
+    title: string;
+    count: number;
+  };
+  subscribe?: {
+    enabled: boolean;
+    title: string;
+    description?: string;
+    style: 'buttons' | 'cards' | 'badges';
+  };
+  about?: {
+    enabled: boolean;
+    title: string;
+    content?: string;
+  };
+  newsletter?: {
+    enabled: boolean;
+    title: string;
+    description?: string;
+    provider?: string;
+    formUrl?: string;
+  };
+  customSections?: Array<{
+    title: string;
+    content: string;
+    order?: number;
+  }>;
+}
+
+/**
+ * About Page Configuration
+ */
+export interface AboutPageConfig {
+  _id: string;
+  title: string;
+  isActive: boolean;
+  aboutSection?: {
+    enabled: boolean;
+    title: string;
+    content?: any[];
+  };
+  hostsSection?: {
+    enabled: boolean;
+    title: string;
+    hosts?: Host[];
+    layout?: 'cards' | 'list';
+  };
+  missionSection?: {
+    enabled: boolean;
+    title: string;
+    content?: any[];
+  };
+  subscribeCTA?: {
+    enabled: boolean;
+    customTitle?: string;
+    customDescription?: string;
+  };
+  communitySection?: {
+    enabled: boolean;
+    customText?: string;
+  };
+  customSections?: Array<{
+    title: string;
+    content: any[];
+    order: number;
+  }>;
 }

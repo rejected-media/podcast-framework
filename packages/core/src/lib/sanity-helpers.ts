@@ -16,7 +16,7 @@
  * ```
  */
 
-import { createSanityClient, getAllEpisodes, getEpisodeBySlug, getAllGuests, getGuestBySlug, getPodcastInfo, getFeaturedEpisodes as getFeaturedEpisodesCore } from './sanity';
+import { createSanityClient, getAllEpisodes, getEpisodeBySlug, getAllGuests, getGuestBySlug, getPodcastInfo, getFeaturedEpisodes as getFeaturedEpisodesCore, getHomepageConfig as getHomepageConfigCore, getAboutPageConfig as getAboutPageConfigCore, getTheme as getThemeCore } from './sanity';
 import type { SanityClient } from '@sanity/client';
 
 // Global client cache (created once per build)
@@ -91,4 +91,25 @@ export async function getPodcast() {
  */
 export async function getFeaturedEpisodes(limit?: number) {
   return getFeaturedEpisodesCore(getClient(), limit);
+}
+
+/**
+ * Get homepage configuration (auto-configured)
+ */
+export async function getHomepageConfig() {
+  return getHomepageConfigCore(getClient());
+}
+
+/**
+ * Get about page configuration (auto-configured)
+ */
+export async function getAboutPageConfig() {
+  return getAboutPageConfigCore(getClient());
+}
+
+/**
+ * Get theme configuration (auto-configured)
+ */
+export async function getTheme() {
+  return getThemeCore(getClient());
 }

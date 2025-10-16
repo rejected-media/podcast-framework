@@ -56,7 +56,7 @@ const visibleNav = navigation.filter(item => item.show !== false);
 ---
 
 <header
-  style="background: var(--color-header-bg);"
+  style="background: rgb(var(--color-header-bg));"
   class="border-b"
   style:border-color={`rgba(${theme.colors.primary}, 0.2)`}
 >
@@ -82,11 +82,11 @@ const visibleNav = navigation.filter(item => item.show !== false);
             </div>
           )}
           <div>
-            <div class="text-xl font-bold" style="color: var(--color-header-text);">
+            <div class="text-xl font-bold" style="color: rgb(var(--color-header-text));">
               {siteName}
             </div>
             {siteTagline && (
-              <p class="text-xs" style="color: var(--color-secondary);">
+              <p class="text-xs" style="color: rgb(var(--color-secondary));">
                 {siteTagline}
               </p>
             )}
@@ -99,7 +99,7 @@ const visibleNav = navigation.filter(item => item.show !== false);
         {visibleNav.map((item) => (
           <a
             href={item.href}
-            style="color: var(--color-secondary);"
+            style="color: rgb(var(--color-secondary));"
             class="font-semibold hover:opacity-75 transition"
           >
             {item.label}
@@ -110,7 +110,7 @@ const visibleNav = navigation.filter(item => item.show !== false);
       <!-- Mobile Menu Button -->
       <button
         id="mobile-menu-button"
-        style="color: var(--color-header-text);"
+        style="color: rgb(var(--color-header-text));"
         class="md:hidden p-2 hover:opacity-75 transition"
         aria-label="Toggle mobile menu"
         aria-expanded="false"
@@ -156,7 +156,7 @@ const visibleNav = navigation.filter(item => item.show !== false);
         {visibleNav.map((item) => (
           <a
             href={item.href}
-            style="color: var(--color-secondary);"
+            style="color: rgb(var(--color-secondary));"
             class={`font-semibold hover:opacity-75 transition px-2 py-2 ${theme.layout.borderRadius}`}
           >
             {item.label}

@@ -307,10 +307,12 @@ export async function getPodcastInfo(
       tagline,
       description,
       isActive,
+      newsletterEnabled,
       "logo": logo.asset->{url},
       spotifyShowId,
-      applePodcastsUrl,
+      appleUrl,
       spotifyUrl,
+      youtubeUrl,
       rssUrl,
       twitterHandle,
       twitterUrl,
@@ -501,6 +503,55 @@ export async function getAboutPageConfig(
     } catch (error) {
       console.error('Failed to fetch about page config from Sanity:', error);
       return undefined;
+    }
+  });
+}
+
+/**
+ * Fetch theme configuration from Sanity
+ *
+ * @param client - Sanity client
+ * @returns Theme or null if not found
+ */
+export async function getTheme(
+  client: SanityClient
+): Promise<any | null> {
+  return cachedFetch('active-theme', async () => {
+    const query = `*[_type == "theme" && isActive == true][0] {
+      "colors": {
+        "primary": colors.primary,
+        "secondary": colors.secondary,
+        "background": colors.background,
+        "surface": colors.surface,
+        "text": colors.text,
+        "textMuted": colors.textMuted,
+        "headerBg": colors.headerBackground,
+        "footerBg": colors.footerBackground,
+        "headerText": colors.headerText,
+        "footerText": colors.footerText
+      },
+      typography,
+      layout
+    }`;
+
+    try {
+      const theme = await client.fetch(query);
+
+      if (!theme) {
+        console.warn('No active theme found in Sanity CMS. Using default theme.');
+        return null;
+      }
+
+      // Validate required fields exist
+      if (!theme.colors || !theme.typography) {
+        console.error('Theme missing required fields (colors or typography). Using default theme.');
+        return null;
+      }
+
+      return theme;
+    } catch (error) {
+      console.error('Failed to fetch theme from Sanity:', error);
+      return null;
     }
   });
 }
