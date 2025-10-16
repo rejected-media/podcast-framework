@@ -123,6 +123,20 @@ export const basePodcastSchema = defineType({
       description: 'Show newsletter signup forms (only visible when podcast is active)',
       initialValue: false,
     }),
+    defineField({
+      name: 'convertKitFormId',
+      title: 'ConvertKit Form ID',
+      type: 'string',
+      description: 'ConvertKit form ID for newsletter signups',
+      hidden: ({ document }) => !document?.newsletterEnabled,
+    }),
+    defineField({
+      name: 'convertKitApiKey',
+      title: 'ConvertKit API Key',
+      type: 'string',
+      description: 'ConvertKit API key for newsletter integration',
+      hidden: ({ document }) => !document?.newsletterEnabled,
+    }),
   ],
 });
 
