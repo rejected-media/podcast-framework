@@ -117,6 +117,8 @@ export const createCommand = new Command('create')
           '@podcast-framework/core': '^0.1.0',
           '@podcast-framework/sanity-schema': '^1.0.0',
           'astro': '^5.1.0',
+          'react': '^19.2.0',
+          'react-dom': '^19.2.0',
           'sanity': '^3.0.0',
           '@sanity/client': '^6.0.0'
         },
@@ -284,6 +286,27 @@ MIT
 `;
 
       writeFileSync(join(projectDir, 'README.md'), readme);
+
+      // Generate sanity.cli.ts
+      const sanityCliConfig = `/**
+ * Sanity CLI Configuration
+ *
+ * SETUP REQUIRED:
+ * Replace 'your-project-id' with your actual Sanity project ID
+ * This is required for deploying your Studio to sanity.studio
+ */
+
+import { defineCliConfig } from "sanity/cli";
+
+export default defineCliConfig({
+  api: {
+    projectId: "your-project-id", // TODO: Replace with your Sanity project ID
+    dataset: "production",
+  },
+});
+`;
+
+      writeFileSync(join(projectDir, 'sanity.cli.ts'), sanityCliConfig);
 
       spinner.succeed(chalk.green('Project created successfully!'));
 
