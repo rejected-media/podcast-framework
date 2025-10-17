@@ -20,6 +20,7 @@ program
 
 // Import commands
 import { createCommand } from './commands/create';
+import { importRssCommand } from './commands/import-rss';
 import { infoCommand } from './commands/info';
 import { validateCommand } from './commands/validate';
 import { listComponentsCommand } from './commands/list-components';
@@ -32,6 +33,7 @@ import { checkUpdatesCommand } from './commands/check-updates';
 
 // Register commands (in logical order)
 program.addCommand(createCommand);
+program.addCommand(importRssCommand);
 program.addCommand(infoCommand);
 program.addCommand(validateCommand);
 program.addCommand(listComponentsCommand);

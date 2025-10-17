@@ -108,6 +108,7 @@ export const createCommand = new Command('create')
           build: 'astro check && astro build',
           preview: 'astro preview',
           'dev:sanity': 'cd sanity && npx sanity dev',
+          'import:episodes': 'podcast-framework import-rss',
         },
         dependencies: {
           '@podcast-framework/core': '^0.1.0',
@@ -185,6 +186,9 @@ export default defineConfig({
 SANITY_PROJECT_ID=your_project_id
 SANITY_DATASET=production
 SANITY_TOKEN=your_token
+
+# RSS Import (optional)
+RSS_FEED_URL=https://feeds.transistor.fm/your-show
 
 # Analytics
 PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX

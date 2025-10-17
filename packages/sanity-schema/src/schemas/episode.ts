@@ -117,6 +117,14 @@ export const baseEpisodeSchema = defineType({
       type: 'url',
       description: 'Direct MP3 URL for transcription (from RSS feed or podcast host)',
     }),
+    defineField({
+      name: 'rssGuid',
+      title: 'RSS GUID',
+      type: 'string',
+      description: 'Unique identifier from RSS feed (used for duplicate detection during imports)',
+      hidden: true,
+      readOnly: true,
+    }),
 
     // Features
     defineField({
