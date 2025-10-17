@@ -1,6 +1,6 @@
 {
   "name": "@rejected-media/create-podcast-framework",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Scaffolding tool for creating new podcast framework projects",
   "author": "Rex Kirshner",
   "license": "MIT",

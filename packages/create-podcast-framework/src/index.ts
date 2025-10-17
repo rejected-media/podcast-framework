@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * @rejected-media/create-podcast-framework
  *
