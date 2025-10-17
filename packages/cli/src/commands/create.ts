@@ -107,14 +107,15 @@ export const createCommand = new Command('create')
           dev: 'astro dev',
           build: 'astro check && astro build',
           preview: 'astro preview',
+          'dev:sanity': 'cd sanity && npx sanity dev',
         },
         dependencies: {
           '@podcast-framework/core': '^0.1.0',
           '@podcast-framework/sanity-schema': '^1.0.0',
           'astro': '^5.1.0',
-          'react': '^19.2.0',
-          'react-dom': '^19.2.0',
-          'sanity': '^3.0.0',
+          'react': '^19.0.0',
+          'react-dom': '^19.0.0',
+          'sanity': '^4.0.0',
           '@sanity/client': '^6.0.0'
         },
         devDependencies: {
