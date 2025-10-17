@@ -112,7 +112,8 @@ export const createCommand = new Command('create')
         },
         dependencies: {
           '@podcast-framework/core': '^0.1.0',
-          '@podcast-framework/sanity-schema': '^1.0.0',
+          '@podcast-framework/sanity-schema': '^1.1.0',
+          '@rejected-media/podcast-framework-cli': '^0.1.8',
           'astro': '^5.1.0',
           'react': '^19.0.0',
           'react-dom': '^19.0.0',
