@@ -14,6 +14,7 @@ import { join } from 'path';
 interface CreateOptions {
   template?: string;
   skipInstall?: boolean;
+  yes?: boolean;
 }
 
 export const createCommand = new Command('create')
@@ -21,6 +22,7 @@ export const createCommand = new Command('create')
   .argument('[name]', 'Project name (will prompt if not provided)')
   .option('-t, --template <template>', 'Template to use (default: basic)')
   .option('--skip-install', 'Skip npm install')
+  .option('-y, --yes', 'Skip all prompts and use defaults')
   .action(async (projectName: string | undefined, options: CreateOptions) => {
     console.log(chalk.bold('\n🎙️  Create New Podcast Project\n'));
 
@@ -55,38 +57,31 @@ export const createCommand = new Command('create')
       process.exit(1);
     }
 
-    // Gather project info
-    console.log('');
-    const answers = await inquirer.prompt([
-      {
-        type: 'input',
-        name: 'tagline',
-        message: 'Podcast tagline (optional):',
-      },
-      {
-        type: 'input',
-        name: 'description',
-        message: 'Short description:',
-      },
-      {
-        type: 'confirm',
-        name: 'includeNewsletter',
-        message: 'Include newsletter signup?',
-        default: true,
-      },
-      {
-        type: 'confirm',
-        name: 'includeContributions',
-        message: 'Include community contributions feature?',
-        default: true,
-      },
-      {
-        type: 'confirm',
-        name: 'includeSearch',
-        message: 'Include episode search?',
-        default: true,
-      }
-    ]);
+    // Gather project info (minimal prompts)
+    let description = `${projectName} - A podcast built with @podcast-framework`;
+
+    // Only prompt if not using --yes flag
+    if (!options.yes) {
+      console.log('');
+      const answers = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'description',
+          message: 'Short description (press Enter to use default):',
+          default: description,
+        }
+      ]);
+      description = answers.description || description;
+    }
+
+    // Use sensible defaults for all features
+    const projectConfig = {
+      description,
+      tagline: '', // Can be added later in config
+      includeNewsletter: true,
+      includeContributions: true,
+      includeSearch: true,
+    };
 
     // Create project
     const spinner = ora('Creating project structure...').start();
@@ -136,8 +131,8 @@ export const createCommand = new Command('create')
       // Generate podcast.config.js
       const podcastConfig = `export default {
   name: "${projectName}",
-  tagline: "${answers.tagline || ''}",
-  description: "${answers.description || ''}",
+  tagline: "${projectConfig.tagline}",
+  description: "${projectConfig.description}",
   domain: "${projectSlug}.com",
   url: "https://${projectSlug}.com",
 
@@ -149,9 +144,9 @@ export const createCommand = new Command('create')
 
   features: {
     transcripts: true,
-    newsletter: ${answers.includeNewsletter},
-    contributions: ${answers.includeContributions},
-    search: ${answers.includeSearch},
+    newsletter: ${projectConfig.includeNewsletter},
+    contributions: ${projectConfig.includeContributions},
+    search: ${projectConfig.includeSearch},
     comments: false,
     platformLinks: {
       spotify: true,
@@ -211,21 +206,21 @@ const podcastInfo = {
   _id: 'temp',
   _type: 'podcast' as const,
   name: '${projectName}',
-  tagline: '${answers.tagline || ''}',
-  description: '${answers.description || ''}',
+  tagline: '${projectConfig.tagline}',
+  description: '${projectConfig.description}',
   isActive: true
 };
 ---
 
 <BaseLayout
   title="${projectName} - Home"
-  description="${answers.description || 'A great podcast'}"
+  description="${projectConfig.description}"
   podcastInfo={podcastInfo}
 >
   <main class="max-w-4xl mx-auto px-4 py-12 flex-grow">
     <h1 class="text-4xl font-bold mb-4">Welcome to ${projectName}</h1>
     <p class="text-lg text-gray-600 mb-8">
-      ${answers.description || 'Your podcast description goes here'}
+      ${projectConfig.description}
     </p>
 
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -253,7 +248,7 @@ const podcastInfo = {
       // Generate README
       const readme = `# ${projectName}
 
-${answers.description || 'A podcast website built with @podcast-framework'}
+${projectConfig.description}
 
 ## Getting Started
 
