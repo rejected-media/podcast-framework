@@ -171,7 +171,7 @@ export const createCommand = new Command('create')
       writeFileSync(join(projectDir, 'podcast.config.js'), podcastConfig);
 
       // Generate astro.config.mjs
-      const astroConfig = `import { defineConfig } from 'astro';
+      const astroConfig = `import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   site: 'https://${projectSlug}.com',
