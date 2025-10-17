@@ -1,12 +1,12 @@
 {
   "name": "@rejected-media/create-podcast-framework",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Scaffolding tool for creating new podcast framework projects",
   "author": "Rex Kirshner",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "create-podcast-framework": "./dist/index.js"
+    "create-podcast-framework": "dist/index.js"
   },
   "files": [
     "dist"
@@ -37,7 +37,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/rejected-media/podcast-framework.git",
+    "url": "git+https://github.com/rejected-media/podcast-framework.git",
     "directory": "packages/create-podcast-framework"
   },
   "engines": {
