@@ -1,6 +1,6 @@
 {
   "name": "@rejected-media/podcast-framework-cli",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "CLI tool for creating and managing podcast framework projects",
   "author": "Rex Kirshner",
   "license": "MIT",

@@ -116,7 +116,8 @@ export const createCommand = new Command('create')
           'react': '^19.0.0',
           'react-dom': '^19.0.0',
           'sanity': '^4.0.0',
-          '@sanity/client': '^6.0.0'
+          '@sanity/client': '^6.0.0',
+          '@sanity/vision': '^3.0.0'
         },
         devDependencies: {
           '@astrojs/check': '^0.9.0',
