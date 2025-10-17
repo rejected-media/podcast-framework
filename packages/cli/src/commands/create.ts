@@ -304,6 +304,74 @@ export default defineCliConfig({
 
       writeFileSync(join(projectDir, 'sanity.cli.ts'), sanityCliConfig);
 
+      // Generate sanity.config.ts
+      const sanityConfig = `/**
+ * Sanity Studio Configuration
+ *
+ * This file configures your Sanity Studio.
+ * See https://www.sanity.io/docs/configuration
+ */
+
+import { defineConfig } from 'sanity';
+import { structureTool } from 'sanity/structure';
+import { visionTool } from '@sanity/vision';
+import { schemaTypes } from './sanity/schemas';
+
+export default defineConfig({
+  name: 'default',
+  title: '${projectName}',
+
+  // TODO: Add your Sanity project ID here
+  // Get it from https://sanity.io/manage
+  projectId: process.env.SANITY_PROJECT_ID || 'your-project-id',
+  dataset: 'production',
+
+  plugins: [
+    structureTool(),
+    visionTool(),
+  ],
+
+  schema: {
+    types: schemaTypes,
+  },
+});
+`;
+
+      writeFileSync(join(projectDir, 'sanity.config.ts'), sanityConfig);
+
+      // Generate sanity/schemas/index.ts
+      const schemasIndex = `/**
+ * Sanity Schema Definitions
+ *
+ * Import schemas from @podcast-framework/sanity-schema
+ * You can also add custom schemas here
+ */
+
+import {
+  episodeSchema,
+  guestSchema,
+  hostSchema,
+  podcastSchema,
+  themeSchema,
+  homepageConfigSchema,
+  aboutPageConfigSchema,
+  contributionSchema,
+} from '@podcast-framework/sanity-schema';
+
+export const schemaTypes = [
+  podcastSchema,
+  episodeSchema,
+  guestSchema,
+  hostSchema,
+  themeSchema,
+  homepageConfigSchema,
+  aboutPageConfigSchema,
+  contributionSchema,
+];
+`;
+
+      writeFileSync(join(projectDir, 'sanity', 'schemas', 'index.ts'), schemasIndex);
+
       spinner.succeed(chalk.green('Project created successfully!'));
 
       // Success message
@@ -319,11 +387,12 @@ export default defineCliConfig({
 
       console.log(chalk.gray(`  npm run dev`));
       console.log('');
-      console.log(chalk.bold('Setup guide:'));
-      console.log(chalk.gray('  1. Create Sanity project at https://sanity.io/manage'));
-      console.log(chalk.gray('  2. Copy .env.template to .env.local'));
-      console.log(chalk.gray('  3. Add your Sanity project ID'));
-      console.log(chalk.gray('  4. Start dev server: npm run dev'));
+      console.log(chalk.bold('Sanity CMS Setup:'));
+      console.log(chalk.gray('  1. Create project at https://sanity.io/manage'));
+      console.log(chalk.gray('  2. Update sanity.config.ts with your project ID'));
+      console.log(chalk.gray('  3. Copy .env.template to .env'));
+      console.log(chalk.gray('  4. Add SANITY_PROJECT_ID to .env'));
+      console.log(chalk.gray('  5. Run: npm run dev:sanity'));
       console.log('');
 
     } catch (error) {
