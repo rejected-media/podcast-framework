@@ -11,37 +11,21 @@
  */
 
 import { spawn } from 'child_process';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 /**
  * Main entry point
  * Spawns the CLI's create command with all arguments passed through
  */
 async function main() {
-  // Get the path to the CLI binary
-  // When published, this will be in node_modules
-  const cliBinPath = join(
-    __dirname,
-    '..',
-    'node_modules',
-    '@rejected-media',
-    'podcast-framework-cli',
-    'bin',
-    'cli.js'
-  );
-
   // Get all arguments passed to this command (excluding node and script path)
   const args = process.argv.slice(2);
 
   // Prepend 'create' command to the arguments
-  const fullArgs = ['create', ...args];
+  const fullArgs = ['--yes', '@rejected-media/podcast-framework-cli', 'create', ...args];
 
-  // Spawn the CLI process
-  const child = spawn('node', [cliBinPath, ...fullArgs], {
+  // Spawn the CLI process via npx
+  // This ensures the dependency is resolved correctly regardless of installation location
+  const child = spawn('npx', fullArgs, {
     stdio: 'inherit', // Pass through stdin/stdout/stderr
     shell: false,
   });
