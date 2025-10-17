@@ -16,7 +16,7 @@
     "dev:core": "npm run dev --workspace=packages/core",
     "build:core": "npm run build --workspace=packages/core",
     "dev:cli": "npm run dev --workspace=packages/cli",
-    "build:packages": "npm run build --workspace=packages/core && npm run build --workspace=packages/cli && npm run build --workspace=packages/sanity-schema"
+    "build:packages": "npm run build --workspace=packages/core && npm run build --workspace=packages/cli && npm run build --workspace=packages/sanity-schema && npm run build --workspace=packages/create-podcast-framework"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
