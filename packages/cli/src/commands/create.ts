@@ -114,6 +114,7 @@ export const createCommand = new Command('create')
           '@rejected-media/podcast-framework-core': '^0.1.2',
           '@rejected-media/podcast-framework-sanity-schema': '^1.1.0',
           '@rejected-media/podcast-framework-cli': '^0.1.13',
+          '@astrojs/tailwind': '^5.1.0',
           'astro': '^5.1.0',
           'react': '^19.0.0',
           'react-dom': '^19.0.0',
@@ -121,7 +122,8 @@ export const createCommand = new Command('create')
           'sanity': '^4.0.0',
           '@sanity/client': '^6.0.0',
           '@sanity/vision': '^3.0.0',
-          'styled-components': '^6.1.15'
+          'styled-components': '^6.1.15',
+          'tailwindcss': '^3.4.0'
         },
         devDependencies: {
           '@astrojs/check': '^0.9.0',
@@ -176,13 +178,31 @@ export const createCommand = new Command('create')
 
       // Generate astro.config.mjs
       const astroConfig = `import { defineConfig } from 'astro/config';
+import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   site: 'https://${projectSlug}.com',
+  integrations: [tailwind()],
 });
 `;
 
       writeFileSync(join(projectDir, 'astro.config.mjs'), astroConfig);
+
+      // Generate tailwind.config.mjs
+      const tailwindConfig = `/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    './src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}',
+    './node_modules/@rejected-media/podcast-framework-core/**/*.astro',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+`;
+
+      writeFileSync(join(projectDir, 'tailwind.config.mjs'), tailwindConfig);
 
       // Generate .env.template
       const envTemplate = `# Sanity CMS (Required)
