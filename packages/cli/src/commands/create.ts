@@ -238,14 +238,17 @@ const theme = await getTheme();
 // Fallback to project config if Sanity not configured yet
 const displayName = podcastInfo?.name || '${projectName}';
 const displayDescription = podcastInfo?.description || '${projectConfig.description}';
+
+// Only pass theme if it exists (let BaseLayout use default if null)
+const layoutProps = {
+  title: \`\${displayName} - Home\`,
+  description: displayDescription,
+  podcastInfo,
+  ...(theme && { theme })
+};
 ---
 
-<BaseLayout
-  title={\`\${displayName} - Home\`}
-  description={displayDescription}
-  podcastInfo={podcastInfo}
-  theme={theme}
->
+<BaseLayout {...layoutProps}>
   <main class="max-w-4xl mx-auto px-4 py-12 flex-grow">
     <h1 class="text-4xl font-bold mb-4">Welcome to {displayName}</h1>
     <p class="text-lg text-gray-600 mb-8">
