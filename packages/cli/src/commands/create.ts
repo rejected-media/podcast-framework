@@ -117,6 +117,7 @@ export const createCommand = new Command('create')
           'astro': '^5.1.0',
           'react': '^19.0.0',
           'react-dom': '^19.0.0',
+          'resend': '^4.0.0',
           'sanity': '^4.0.0',
           '@sanity/client': '^6.0.0',
           '@sanity/vision': '^3.0.0',
