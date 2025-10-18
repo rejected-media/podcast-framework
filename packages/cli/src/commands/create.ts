@@ -111,15 +111,16 @@ export const createCommand = new Command('create')
           'import:episodes': 'podcast-framework import-rss',
         },
         dependencies: {
-          '@podcast-framework/core': '^0.1.0',
-          '@podcast-framework/sanity-schema': '^1.1.0',
-          '@rejected-media/podcast-framework-cli': '^0.1.8',
+          '@rejected-media/podcast-framework-core': '^0.1.1',
+          '@rejected-media/podcast-framework-sanity-schema': '^1.1.0',
+          '@rejected-media/podcast-framework-cli': '^0.1.9',
           'astro': '^5.1.0',
           'react': '^19.0.0',
           'react-dom': '^19.0.0',
           'sanity': '^4.0.0',
           '@sanity/client': '^6.0.0',
-          '@sanity/vision': '^3.0.0'
+          '@sanity/vision': '^3.0.0',
+          'styled-components': '^6.1.15'
         },
         devDependencies: {
           '@astrojs/check': '^0.9.0',
@@ -207,7 +208,7 @@ CLOUDFLARE_API_TOKEN=
 
       // Generate homepage
       const homepage = `---
-import BaseLayout from '@podcast-framework/core/layouts/BaseLayout.astro';
+import BaseLayout from '@rejected-media/podcast-framework-core/layouts/BaseLayout.astro';
 
 const podcastInfo = {
   _id: 'temp',
@@ -233,7 +234,7 @@ const podcastInfo = {
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
       <h2 class="font-semibold mb-2">🎉 Your podcast is ready!</h2>
       <p class="text-sm text-gray-700 mb-4">
-        This project was created with @podcast-framework/cli
+        This project was created with @rejected-media/podcast-framework-cli
       </p>
       <p class="text-sm text-gray-700">
         Next steps:
@@ -280,7 +281,7 @@ npm run build
 ## Documentation
 
 - Framework Docs: https://github.com/rejected-media/podcast-framework
-- Component Reference: @podcast-framework/core/COMPONENTS.md
+- Component Reference: @rejected-media/podcast-framework-core/COMPONENTS.md
 
 ## License
 
@@ -349,7 +350,7 @@ export default defineConfig({
       const schemasIndex = `/**
  * Sanity Schema Definitions
  *
- * Import schemas from @podcast-framework/sanity-schema
+ * Import schemas from @rejected-media/podcast-framework-sanity-schema
  * You can also add custom schemas here
  */
 
@@ -362,7 +363,7 @@ import {
   homepageConfigSchema,
   aboutPageConfigSchema,
   contributionSchema,
-} from '@podcast-framework/sanity-schema';
+} from '@rejected-media/podcast-framework-sanity-schema';
 
 export const schemaTypes = [
   podcastSchema,
