@@ -44,10 +44,13 @@ const {
   description,
   ogImage: propOgImage,
   podcastInfo,
-  theme = defaultTheme,
+  theme: propTheme,
   gaId,
   structuredData
 } = Astro.props;
+
+// Handle null theme explicitly (use defaultTheme if theme is null or undefined)
+const theme = propTheme || defaultTheme;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
