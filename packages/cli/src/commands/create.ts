@@ -184,22 +184,37 @@ export default defineConfig({
       writeFileSync(join(projectDir, 'astro.config.mjs'), astroConfig);
 
       // Generate .env.template
-      const envTemplate = `# Sanity CMS
-SANITY_PROJECT_ID=your_project_id
-SANITY_DATASET=production
-SANITY_TOKEN=your_token
+      const envTemplate = `# Sanity CMS (Required)
+# Get your project ID from https://sanity.io/manage
+PUBLIC_SANITY_PROJECT_ID=your_project_id
+PUBLIC_SANITY_DATASET=production
+PUBLIC_SANITY_API_VERSION=2024-01-01
 
-# RSS Import (optional)
+# Sanity Write Token (Required for Sanity Studio and RSS import)
+SANITY_TOKEN=your_write_token
+
+# Site URL (Required for production)
+PUBLIC_SITE_URL=https://your-podcast.com
+
+# RSS Import (Optional)
+# Add your podcast RSS feed URL to import episodes
 RSS_FEED_URL=https://feeds.transistor.fm/your-show
 
-# Analytics
+# Analytics (Optional)
 PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
-# Newsletter (optional)
+# Newsletter (Optional - ConvertKit)
 CONVERTKIT_API_KEY=
 CONVERTKIT_FORM_ID=
 
-# Deployment
+# Contributions (Optional - Resend)
+RESEND_API_KEY=
+NOTIFICATION_EMAIL=your@email.com
+
+# Error Tracking (Optional - Sentry)
+SENTRY_DSN=
+
+# Deployment (Optional - Cloudflare)
 CLOUDFLARE_ACCOUNT_ID=
 CLOUDFLARE_API_TOKEN=
 `;
@@ -209,44 +224,104 @@ CLOUDFLARE_API_TOKEN=
       // Generate homepage
       const homepage = `---
 import BaseLayout from '@rejected-media/podcast-framework-core/layouts/BaseLayout.astro';
+import { getPodcast, getEpisodes, getTheme } from '@rejected-media/podcast-framework-core';
+import { formatDate } from '@rejected-media/podcast-framework-core';
 
-const podcastInfo = {
-  _id: 'temp',
-  _type: 'podcast' as const,
-  name: '${projectName}',
-  tagline: '${projectConfig.tagline}',
-  description: '${projectConfig.description}',
-  isActive: true
-};
+export const prerender = true;
+
+// Fetch data from Sanity (or use defaults if not configured)
+const podcastInfo = await getPodcast();
+const episodes = await getEpisodes({ limit: 5, orderBy: 'desc' });
+const theme = await getTheme();
+
+// Fallback to project config if Sanity not configured yet
+const displayName = podcastInfo?.name || '${projectName}';
+const displayDescription = podcastInfo?.description || '${projectConfig.description}';
 ---
 
 <BaseLayout
-  title="${projectName} - Home"
-  description="${projectConfig.description}"
+  title={\`\${displayName} - Home\`}
+  description={displayDescription}
   podcastInfo={podcastInfo}
+  theme={theme}
 >
   <main class="max-w-4xl mx-auto px-4 py-12 flex-grow">
-    <h1 class="text-4xl font-bold mb-4">Welcome to ${projectName}</h1>
+    <h1 class="text-4xl font-bold mb-4">Welcome to {displayName}</h1>
     <p class="text-lg text-gray-600 mb-8">
-      ${projectConfig.description}
+      {displayDescription}
     </p>
 
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-      <h2 class="font-semibold mb-2">🎉 Your podcast is ready!</h2>
-      <p class="text-sm text-gray-700 mb-4">
-        This project was created with @rejected-media/podcast-framework-cli
-      </p>
-      <p class="text-sm text-gray-700">
-        Next steps:
-      </p>
-      <ol class="text-sm text-gray-700 list-decimal list-inside space-y-1 mt-2">
-        <li>Set up Sanity CMS project</li>
-        <li>Configure environment variables</li>
-        <li>Import your podcast feed</li>
-        <li>Customize theme and components</li>
-        <li>Deploy to Cloudflare Pages</li>
-      </ol>
-    </div>
+    {!podcastInfo && (
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+        <h2 class="font-semibold mb-2">🎉 Your podcast is ready!</h2>
+        <p class="text-sm text-gray-700 mb-4">
+          This project was created with @rejected-media/podcast-framework-cli
+        </p>
+        <p class="text-sm text-gray-700 mb-2">
+          Next steps:
+        </p>
+        <ol class="text-sm text-gray-700 list-decimal list-inside space-y-1 mt-2">
+          <li>Set up Sanity CMS project at <a href="https://sanity.io/manage" class="text-blue-600 underline" target="_blank">sanity.io/manage</a></li>
+          <li>Update <code class="bg-gray-100 px-1 rounded">sanity.config.ts</code> with your project ID</li>
+          <li>Copy <code class="bg-gray-100 px-1 rounded">.env.template</code> to <code class="bg-gray-100 px-1 rounded">.env</code> and add credentials</li>
+          <li>Run <code class="bg-gray-100 px-1 rounded">npm run import:episodes</code> to import your podcast feed</li>
+          <li>Refresh this page to see your podcast data!</li>
+        </ol>
+      </div>
+    )}
+
+    {episodes && episodes.length > 0 && (
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Recent Episodes</h2>
+        <div class="space-y-4">
+          {episodes.map((episode) => (
+            <a
+              href={\`/episodes/\${episode.slug.current}\`}
+              class="block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+            >
+              <div class="flex items-start gap-4">
+                {episode.coverImage?.url && (
+                  <img
+                    src={episode.coverImage.url}
+                    alt={episode.title}
+                    class="w-20 h-20 rounded object-cover flex-shrink-0"
+                  />
+                )}
+                <div class="flex-grow min-w-0">
+                  <p class="text-sm text-gray-500 mb-1">Episode {episode.episodeNumber}</p>
+                  <h3 class="text-lg font-semibold mb-1">{episode.title}</h3>
+                  <p class="text-sm text-gray-600 line-clamp-2">{episode.description}</p>
+                  <p class="text-sm text-gray-500 mt-2">{formatDate(episode.publishDate)}</p>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+        <a
+          href="/episodes"
+          class="inline-block mt-6 text-blue-600 hover:text-blue-800 font-medium"
+        >
+          View all episodes →
+        </a>
+      </div>
+    )}
+
+    {podcastInfo && episodes && episodes.length === 0 && (
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <h2 class="font-semibold mb-2">📥 Import Your Episodes</h2>
+        <p class="text-sm text-gray-700 mb-4">
+          Sanity is configured but no episodes found.
+        </p>
+        <p class="text-sm text-gray-700 mb-2">
+          Import your podcast feed:
+        </p>
+        <ol class="text-sm text-gray-700 list-decimal list-inside space-y-1">
+          <li>Add your RSS feed URL to <code class="bg-gray-100 px-1 rounded">.env</code></li>
+          <li>Run <code class="bg-gray-100 px-1 rounded">npm run import:episodes</code></li>
+          <li>Refresh this page to see your episodes!</li>
+        </ol>
+      </div>
+    )}
   </main>
 </BaseLayout>
 `;
