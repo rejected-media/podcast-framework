@@ -91,6 +91,9 @@ export const createCommand = new Command('create')
       mkdirSync(projectDir);
       mkdirSync(join(projectDir, 'src'));
       mkdirSync(join(projectDir, 'src', 'pages'));
+      mkdirSync(join(projectDir, 'src', 'pages', 'episodes'));
+      mkdirSync(join(projectDir, 'src', 'pages', 'guests'));
+      mkdirSync(join(projectDir, 'src', 'pages', 'guest'));
       mkdirSync(join(projectDir, 'src', 'components'));
       mkdirSync(join(projectDir, 'public'));
       mkdirSync(join(projectDir, 'sanity'));
@@ -351,6 +354,414 @@ const layoutProps = {
 `;
 
       writeFileSync(join(projectDir, 'src', 'pages', 'index.astro'), homepage);
+
+      // Generate episodes list page
+      const episodesPage = `---
+import BaseLayout from '@rejected-media/podcast-framework-core/layouts/BaseLayout.astro';
+import { getPodcast, getEpisodes, getTheme } from '@rejected-media/podcast-framework-core';
+import { formatDate } from '@rejected-media/podcast-framework-core';
+
+export const prerender = true;
+
+const podcastInfo = await getPodcast();
+const episodes = await getEpisodes({ orderBy: 'desc' });
+const theme = await getTheme();
+
+const layoutProps = {
+  title: \`Episodes - \${podcastInfo?.name || '${projectName}'}\`,
+  description: \`All episodes of \${podcastInfo?.name || '${projectName}'}\`,
+  podcastInfo,
+  ...(theme && { theme })
+};
+---
+
+<BaseLayout {...layoutProps}>
+  <main class="max-w-6xl mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-8">All Episodes</h1>
+
+    {episodes && episodes.length > 0 ? (
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {episodes.map((episode) => (
+          <a
+            href={\`/episodes/\${episode.slug.current}\`}
+            class="block bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition"
+          >
+            {episode.coverImage?.url && (
+              <img
+                src={episode.coverImage.url}
+                alt={episode.title}
+                class="w-full aspect-square object-cover rounded-lg mb-4"
+              />
+            )}
+            <p class="text-sm text-gray-500 mb-2">Episode {episode.episodeNumber}</p>
+            <h2 class="text-xl font-semibold mb-2">{episode.title}</h2>
+            <p class="text-sm text-gray-600 mb-3 line-clamp-3">{episode.description}</p>
+            <p class="text-sm text-gray-500">{formatDate(episode.publishDate)}</p>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
+        <p class="text-gray-700 mb-4">No episodes found. Import your RSS feed to get started!</p>
+        <code class="text-sm bg-gray-100 px-3 py-1 rounded">npm run import:episodes</code>
+      </div>
+    )}
+  </main>
+</BaseLayout>
+`;
+
+      writeFileSync(join(projectDir, 'src', 'pages', 'episodes', 'index.astro'), episodesPage);
+
+      // Generate individual episode page
+      const episodePage = `---
+import BaseLayout from '@rejected-media/podcast-framework-core/layouts/BaseLayout.astro';
+import { getPodcast, getEpisode, getTheme, getStaticPathsForEpisodes } from '@rejected-media/podcast-framework-core';
+import { formatDate, formatDuration } from '@rejected-media/podcast-framework-core';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  return getStaticPathsForEpisodes();
+}
+
+const { slug } = Astro.params;
+const episode = await getEpisode(slug!);
+const podcastInfo = await getPodcast();
+const theme = await getTheme();
+
+if (!episode) {
+  return Astro.redirect('/404');
+}
+
+const layoutProps = {
+  title: \`\${episode.title} - \${podcastInfo?.name || '${projectName}'}\`,
+  description: episode.description || \`Listen to \${episode.title}\`,
+  podcastInfo,
+  ...(theme && { theme })
+};
+---
+
+<BaseLayout {...layoutProps}>
+  <main class="max-w-4xl mx-auto px-4 py-12">
+    <a href="/episodes" class="text-blue-600 hover:text-blue-800 mb-6 inline-block">
+      ← Back to Episodes
+    </a>
+
+    <div class="mb-8">
+      {episode.coverImage?.url && (
+        <img
+          src={episode.coverImage.url}
+          alt={episode.title}
+          class="w-full max-w-md mx-auto rounded-lg shadow-lg mb-6"
+        />
+      )}
+
+      <p class="text-sm text-gray-500 mb-2">Episode {episode.episodeNumber}</p>
+      <h1 class="text-4xl font-bold mb-4">{episode.title}</h1>
+
+      <div class="flex gap-4 text-sm text-gray-600 mb-6">
+        <span>{formatDate(episode.publishDate)}</span>
+        {episode.duration && <span>{formatDuration(episode.duration)}</span>}
+      </div>
+
+      {episode.description && (
+        <p class="text-lg text-gray-700 mb-8">{episode.description}</p>
+      )}
+
+      {/* Spotify Player */}
+      {episode.spotifyUrl && (
+        <div class="mb-8">
+          <iframe
+            src={\`https://open.spotify.com/embed/episode/\${episode.spotifyUrl.split('/').pop()}\`}
+            width="100%"
+            height="232"
+            frameborder="0"
+            allowtransparency="true"
+            allow="encrypted-media"
+            class="rounded-lg"
+          ></iframe>
+        </div>
+      )}
+
+      {/* Show Notes */}
+      {episode.showNotes && (
+        <div class="prose max-w-none mb-8">
+          <h2>Show Notes</h2>
+          <div set:html={episode.showNotes} />
+        </div>
+      )}
+
+      {/* Guests */}
+      {episode.guests && episode.guests.length > 0 && (
+        <div class="mb-8">
+          <h2 class="text-2xl font-bold mb-4">Guests</h2>
+          <div class="grid gap-4 md:grid-cols-2">
+            {episode.guests.map((guest: any) => (
+              <a href={\`/guest/\${guest.slug.current}\`} class="flex gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                {guest.photo?.url && (
+                  <img src={guest.photo.url} alt={guest.name} class="w-16 h-16 rounded-full object-cover" />
+                )}
+                <div>
+                  <h3 class="font-semibold">{guest.name}</h3>
+                  {guest.title && <p class="text-sm text-gray-600">{guest.title}</p>}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Links */}
+      <div class="flex flex-wrap gap-4">
+        {episode.spotifyUrl && (
+          <a href={episode.spotifyUrl} target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+            Listen on Spotify
+          </a>
+        )}
+        {episode.applePodcastsUrl && (
+          <a href={episode.applePodcastsUrl} target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+            Listen on Apple Podcasts
+          </a>
+        )}
+        {episode.youtubeUrl && (
+          <a href={episode.youtubeUrl} target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+            Watch on YouTube
+          </a>
+        )}
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+`;
+
+      writeFileSync(join(projectDir, 'src', 'pages', 'episodes', '[slug].astro'), episodePage);
+
+      // Generate guests directory page
+      const guestsPage = `---
+import BaseLayout from '@rejected-media/podcast-framework-core/layouts/BaseLayout.astro';
+import { getPodcast, getGuests, getTheme } from '@rejected-media/podcast-framework-core';
+
+export const prerender = true;
+
+const podcastInfo = await getPodcast();
+const guests = await getGuests();
+const theme = await getTheme();
+
+const layoutProps = {
+  title: \`Guests - \${podcastInfo?.name || '${projectName}'}\`,
+  description: \`Meet the guests of \${podcastInfo?.name || '${projectName}'}\`,
+  podcastInfo,
+  ...(theme && { theme })
+};
+---
+
+<BaseLayout {...layoutProps}>
+  <main class="max-w-6xl mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-8">Guests</h1>
+
+    {guests && guests.length > 0 ? (
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {guests.map((guest) => (
+          <a href={\`/guest/\${guest.slug.current}\`} class="block bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition">
+            {guest.photo?.url && (
+              <img src={guest.photo.url} alt={guest.name} class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" />
+            )}
+            <h2 class="text-xl font-semibold text-center mb-2">{guest.name}</h2>
+            {guest.title && <p class="text-sm text-gray-600 text-center mb-3">{guest.title}</p>}
+            {guest.bio && <p class="text-sm text-gray-600 line-clamp-3">{guest.bio}</p>}
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
+        <p class="text-gray-700">No guests found. Add guests in Sanity Studio!</p>
+      </div>
+    )}
+  </main>
+</BaseLayout>
+`;
+
+      writeFileSync(join(projectDir, 'src', 'pages', 'guests', 'index.astro'), guestsPage);
+
+      // Generate individual guest page
+      const guestPage = `---
+import BaseLayout from '@rejected-media/podcast-framework-core/layouts/BaseLayout.astro';
+import { getPodcast, getGuest, getEpisodesByGuest, getTheme, getStaticPathsForGuests } from '@rejected-media/podcast-framework-core';
+import { formatDate } from '@rejected-media/podcast-framework-core';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  return getStaticPathsForGuests();
+}
+
+const { slug } = Astro.params;
+const guest = await getGuest(slug!);
+const podcastInfo = await getPodcast();
+const episodes = guest ? await getEpisodesByGuest(guest._id) : [];
+const theme = await getTheme();
+
+if (!guest) {
+  return Astro.redirect('/404');
+}
+
+const layoutProps = {
+  title: \`\${guest.name} - \${podcastInfo?.name || '${projectName}'}\`,
+  description: guest.bio || \`Episodes featuring \${guest.name}\`,
+  podcastInfo,
+  ...(theme && { theme })
+};
+---
+
+<BaseLayout {...layoutProps}>
+  <main class="max-w-4xl mx-auto px-4 py-12">
+    <a href="/guests" class="text-blue-600 hover:text-blue-800 mb-6 inline-block">← Back to Guests</a>
+
+    <div class="text-center mb-12">
+      {guest.photo?.url && (
+        <img src={guest.photo.url} alt={guest.name} class="w-48 h-48 rounded-full mx-auto mb-6 object-cover" />
+      )}
+      <h1 class="text-4xl font-bold mb-2">{guest.name}</h1>
+      {guest.title && <p class="text-xl text-gray-600 mb-4">{guest.title}</p>}
+      {guest.bio && <p class="text-lg text-gray-700 max-w-2xl mx-auto">{guest.bio}</p>}
+
+      <div class="flex justify-center gap-4 mt-6">
+        {guest.twitterHandle && (
+          <a href={\`https://twitter.com/\${guest.twitterHandle}\`} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800">Twitter</a>
+        )}
+        {guest.linkedinUrl && (
+          <a href={guest.linkedinUrl} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800">LinkedIn</a>
+        )}
+        {guest.websiteUrl && (
+          <a href={guest.websiteUrl} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800">Website</a>
+        )}
+      </div>
+    </div>
+
+    {episodes && episodes.length > 0 && (
+      <div>
+        <h2 class="text-2xl font-bold mb-6">Episodes featuring {guest.name}</h2>
+        <div class="space-y-4">
+          {episodes.map((episode) => (
+            <a href={\`/episodes/\${episode.slug.current}\`} class="block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+              <div class="flex gap-4">
+                {episode.coverImage?.url && (
+                  <img src={episode.coverImage.url} alt={episode.title} class="w-20 h-20 rounded object-cover" />
+                )}
+                <div>
+                  <p class="text-sm text-gray-500 mb-1">Episode {episode.episodeNumber}</p>
+                  <h3 class="text-lg font-semibold mb-1">{episode.title}</h3>
+                  <p class="text-sm text-gray-600">{formatDate(episode.publishDate)}</p>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </main>
+</BaseLayout>
+`;
+
+      writeFileSync(join(projectDir, 'src', 'pages', 'guest', '[slug].astro'), guestPage);
+
+      // Generate about page
+      const aboutPage = `---
+import BaseLayout from '@rejected-media/podcast-framework-core/layouts/BaseLayout.astro';
+import { getPodcast, getTheme } from '@rejected-media/podcast-framework-core';
+
+export const prerender = true;
+
+const podcastInfo = await getPodcast();
+const theme = await getTheme();
+
+const layoutProps = {
+  title: \`About - \${podcastInfo?.name || '${projectName}'}\`,
+  description: podcastInfo?.description || 'Learn more about ${projectName}',
+  podcastInfo,
+  ...(theme && { theme })
+};
+---
+
+<BaseLayout {...layoutProps}>
+  <main class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-8">About</h1>
+
+    {podcastInfo?.description && (
+      <div class="prose max-w-none mb-8">
+        <p class="text-lg">{podcastInfo.description}</p>
+      </div>
+    )}
+
+    <div class="bg-gray-50 rounded-lg p-8 mb-8">
+      <h2 class="text-2xl font-bold mb-4">Listen</h2>
+      <div class="flex flex-wrap gap-4">
+        {podcastInfo?.spotifyUrl && (
+          <a href={podcastInfo.spotifyUrl} target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Spotify</a>
+        )}
+        {podcastInfo?.applePodcastsUrl && (
+          <a href={podcastInfo.applePodcastsUrl} target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">Apple Podcasts</a>
+        )}
+        {podcastInfo?.youtubeUrl && (
+          <a href={podcastInfo.youtubeUrl} target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">YouTube</a>
+        )}
+      </div>
+    </div>
+
+    {!podcastInfo && (
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-8">
+        <p class="text-gray-700">Configure your podcast information in Sanity Studio to customize this page!</p>
+      </div>
+    )}
+  </main>
+</BaseLayout>
+`;
+
+      writeFileSync(join(projectDir, 'src', 'pages', 'about.astro'), aboutPage);
+
+      // Generate contribute page
+      const contributePage = `---
+import BaseLayout from '@rejected-media/podcast-framework-core/layouts/BaseLayout.astro';
+import { getPodcast, getTheme } from '@rejected-media/podcast-framework-core';
+
+export const prerender = true;
+
+const podcastInfo = await getPodcast();
+const theme = await getTheme();
+
+const layoutProps = {
+  title: \`Contribute - \${podcastInfo?.name || '${projectName}'}\`,
+  description: 'Support the podcast',
+  podcastInfo,
+  ...(theme && { theme })
+};
+---
+
+<BaseLayout {...layoutProps}>
+  <main class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-8">Contribute</h1>
+
+    <div class="prose max-w-none mb-8">
+      <p class="text-lg">Thank you for your interest in supporting ${projectName}!</p>
+      <p>There are several ways you can contribute:</p>
+      <ul>
+        <li>Subscribe and listen on your favorite podcast platform</li>
+        <li>Leave a rating and review</li>
+        <li>Share episodes with friends and colleagues</li>
+        <li>Follow us on social media</li>
+      </ul>
+    </div>
+
+    <div class="bg-gray-50 rounded-lg p-8">
+      <h2 class="text-2xl font-bold mb-4">Get in Touch</h2>
+      <p class="text-gray-700 mb-4">Have feedback, suggestions, or want to be a guest? We'd love to hear from you!</p>
+      <p class="text-gray-600">Configure contribution options in Sanity Studio to add sponsor links, donation buttons, or contact forms.</p>
+    </div>
+  </main>
+</BaseLayout>
+`;
+
+      writeFileSync(join(projectDir, 'src', 'pages', 'contribute.astro'), contributePage);
 
       // Generate README
       const readme = `# ${projectName}
