@@ -111,9 +111,9 @@ export const createCommand = new Command('create')
           'import:episodes': 'podcast-framework import-rss',
         },
         dependencies: {
-          '@rejected-media/podcast-framework-core': '^0.1.1',
+          '@rejected-media/podcast-framework-core': '^0.1.2',
           '@rejected-media/podcast-framework-sanity-schema': '^1.1.0',
-          '@rejected-media/podcast-framework-cli': '^0.1.9',
+          '@rejected-media/podcast-framework-cli': '^0.1.13',
           'astro': '^5.1.0',
           'react': '^19.0.0',
           'react-dom': '^19.0.0',
