@@ -2033,11 +2033,11 @@ if (!podcastInfo?.isActive) {
 
   function showMessage(message: string, type: 'success' | 'error') {
     formMessage.textContent = message;
-    formMessage.className = \\\`p-4 rounded-lg \\\${
+    formMessage.className = \`p-4 rounded-lg \${
       type === 'success'
         ? 'bg-green-50 text-green-800 border border-green-200'
         : 'bg-red-50 text-red-800 border border-red-200'
-    }\\\`;
+    }\`;
     formMessage.classList.remove('hidden');
 
     // Scroll to message
