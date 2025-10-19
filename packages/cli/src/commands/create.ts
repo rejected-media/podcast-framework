@@ -1741,7 +1741,7 @@ if (!podcastInfo?.isActive) {
 <script>
   // Form field templates
   const fieldTemplates = {
-    'episode-idea': \\\`
+    'episode-idea': \`
       <div class="space-y-4">
         <div>
           <label for="episodeTopic" class="block text-sm font-medium text-gray-700 mb-1">
@@ -1788,9 +1788,9 @@ if (!podcastInfo?.isActive) {
           <div class="text-xs text-gray-500 mt-1" id="episodeRationale-count">0 / 300</div>
         </div>
       </div>
-    \\\`,
+    \`,
 
-    'guest-recommendation': \\\`
+    'guest-recommendation': \`
       <div class="space-y-4">
         <div>
           <label for="guestName" class="block text-sm font-medium text-gray-700 mb-1">
@@ -1850,9 +1850,9 @@ if (!podcastInfo?.isActive) {
           />
         </div>
       </div>
-    \\\`,
+    \`,
 
-    'question': \\\`
+    'question': \`
       <div class="space-y-4">
         <div>
           <label for="question" class="block text-sm font-medium text-gray-700 mb-1">
@@ -1870,9 +1870,9 @@ if (!podcastInfo?.isActive) {
           <div class="text-xs text-gray-500 mt-1" id="question-count">0 / 500</div>
         </div>
       </div>
-    \\\`,
+    \`,
 
-    'feedback': \\\`
+    'feedback': \`
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -1928,17 +1928,17 @@ if (!podcastInfo?.isActive) {
           <div class="text-xs text-gray-500 mt-1" id="feedbackContent-count">0 / 500</div>
         </div>
       </div>
-    \\\`
+    \`
   };
 
   // Update character counters
   function setupCharCounter(fieldId: string, maxLength: number) {
     const field = document.getElementById(fieldId) as HTMLTextAreaElement;
-    const counter = document.getElementById(\\\`\\\${fieldId}-count\\\`);
+    const counter = document.getElementById(\`\${fieldId}-count\`);
 
     if (field && counter) {
       field.addEventListener('input', () => {
-        counter.textContent = \\\`\\\${field.value.length} / \\\${maxLength}\\\`;
+        counter.textContent = \`\${field.value.length} / \${maxLength}\`;
       });
     }
   }
