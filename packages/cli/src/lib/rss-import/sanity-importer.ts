@@ -63,6 +63,7 @@ export class SanityImporter {
         description: show.description,
         logo: logoImage,
         isActive: true,
+        rssUrl: this.options.feedUrl,
         // Note: Platform links, social links, etc. should be set manually
       };
 
