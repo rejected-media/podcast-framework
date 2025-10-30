@@ -4,21 +4,38 @@
  *
  * Main layout with SEO, analytics, theme, and common components (Header/Footer)
  *
+ * ⚠️ IMPORTANT: Do NOT import this layout directly in your pages!
+ *
+ * This framework layout does not include your project's CSS (global.css, Tailwind, etc.).
+ * Instead, import your project's local BaseLayout wrapper which imports CSS:
+ *
  * @layout
- * @example
+ * @example Correct usage (import from your project):
  * ```astro
  * ---
- * import BaseLayout from '@podcast-framework/core/layouts/BaseLayout.astro';
+ * import BaseLayout from '../layouts/BaseLayout.astro';  // ← Your local wrapper
  * ---
  *
- * <BaseLayout
- *   title="Page Title"
- *   description="Page description for SEO"
- *   ogImage="/custom-og-image.png"
- * >
+ * <BaseLayout title="Page Title" description="Description">
  *   <h1>Page Content</h1>
  * </BaseLayout>
  * ```
+ *
+ * @example Your local wrapper should look like:
+ * ```astro
+ * ---
+ * import FrameworkBaseLayout from '@rejected-media/podcast-framework-core/layouts/BaseLayout.astro';
+ * import '../styles/global.css';  // ← Imports your CSS
+ *
+ * const props = Astro.props;
+ * ---
+ * <FrameworkBaseLayout {...props}>
+ *   <slot />
+ * </FrameworkBaseLayout>
+ * ```
+ *
+ * This wrapper pattern allows the framework to remain CSS-agnostic while
+ * giving you full control over styling (Tailwind, vanilla CSS, etc.).
  */
 
 import type { Theme, PodcastInfo } from '../lib/types';
