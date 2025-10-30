@@ -5,6 +5,15 @@ All notable changes to the @rejected-media/podcast-framework-sanity-schema packa
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2025-10-29
+
+### Added
+- **Guest schema** - Added `title` field for professional titles (Issue #4)
+  - Optional field for guest's job title/role (e.g., "CEO", "Author", "Professor")
+  - Max 100 characters validation
+  - Positioned after name field for better UX
+  - Updated Guest TypeScript interface in core package
+
 ## [1.1.1] - 2025-10-29
 
 ### Added

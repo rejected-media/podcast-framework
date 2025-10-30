@@ -15,6 +15,7 @@ describe('baseGuestSchema', () => {
     const fieldNames = baseGuestSchema.fields.map(f => f.name);
 
     expect(fieldNames).toContain('name');
+    expect(fieldNames).toContain('title');
     expect(fieldNames).toContain('slug');
     expect(fieldNames).toContain('bio');
     expect(fieldNames).toContain('photo');

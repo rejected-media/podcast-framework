@@ -19,6 +19,13 @@ export const baseGuestSchema = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'title',
+      title: 'Professional Title',
+      type: 'string',
+      description: 'Guest\'s job title or role (e.g., "CEO", "Author", "Professor")',
+      validation: (Rule) => Rule.max(100),
+    }),
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',

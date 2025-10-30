@@ -67,6 +67,7 @@ export interface Guest {
   _id: string;
   _type: 'guest';
   name: string;
+  title?: string; // Professional title (e.g., "CEO", "Author", "Professor")
   slug: {
     current: string;
   };

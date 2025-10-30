@@ -1,6 +1,6 @@
 {
   "name": "@rejected-media/podcast-framework-core",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Core components, layouts, and utilities for podcast websites",
   "author": "Rex Kirshner",
   "license": "MIT",
