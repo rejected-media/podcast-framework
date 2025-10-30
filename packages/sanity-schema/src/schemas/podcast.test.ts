@@ -27,7 +27,7 @@ describe('basePodcastSchema', () => {
 
     expect(fieldNames).toContain('spotifyShowId');
     expect(fieldNames).toContain('spotifyUrl');
-    expect(fieldNames).toContain('applePodcastsUrl');
+    expect(fieldNames).toContain('appleUrl');
     expect(fieldNames).toContain('youtubeUrl');
     expect(fieldNames).toContain('rssUrl');
   });
