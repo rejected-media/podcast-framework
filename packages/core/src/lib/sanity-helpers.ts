@@ -17,6 +17,7 @@
  */
 
 import { createSanityClient, getAllEpisodes, getEpisodeBySlug, getAllGuests, getGuestBySlug, getPodcastInfo, getFeaturedEpisodes as getFeaturedEpisodesCore, getHomepageConfig as getHomepageConfigCore, getAboutPageConfig as getAboutPageConfigCore, getTheme as getThemeCore } from './sanity';
+import { formatError } from './error-formatter';
 import type { SanityClient } from '@sanity/client';
 
 // Global client cache (created once per build)
@@ -36,9 +37,19 @@ function getClient(): SanityClient {
   const dataset = import.meta.env.PUBLIC_SANITY_DATASET || import.meta.env.SANITY_DATASET || 'production';
 
   if (!projectId) {
-    throw new Error(
-      'Missing Sanity project ID. Add PUBLIC_SANITY_PROJECT_ID to your .env file'
-    );
+    const errorMessage = formatError({
+      title: 'Missing Sanity Project ID',
+      description: 'Your Sanity CMS project ID is required to fetch content. This should be configured in your environment variables.',
+      troubleshooting: [
+        'Create a .env file in your project root if it doesn\'t exist',
+        'Add PUBLIC_SANITY_PROJECT_ID=your-project-id to the .env file',
+        'Find your project ID at https://sanity.io/manage',
+        'Restart your dev server after adding the environment variable',
+      ],
+      docsUrl: 'https://docs.rejected.media/podcast-framework/configuration',
+      example: '# .env\nPUBLIC_SANITY_PROJECT_ID=abc123xy\nPUBLIC_SANITY_DATASET=production',
+    });
+    throw new Error(errorMessage);
   }
 
   globalClient = createSanityClient({

@@ -90,18 +90,26 @@ describe('getRequiredEnv', () => {
     vi.stubEnv('VAR1', 'value1');
     // VAR2 not set
 
-    expect(() => {
+    try {
       getRequiredEnv(['VAR1', 'VAR2']);
-    }).toThrow('Missing required environment variables: VAR2');
+      expect.fail('Should have thrown error');
+    } catch (error) {
+      expect((error as Error).message).toContain('MISSING REQUIRED ENVIRONMENT VARIABLES');
+      expect((error as Error).message).toContain('VAR2');
+    }
   });
 
   it('throws error listing all missing vars', () => {
     vi.stubEnv('VAR1', 'value1');
     // VAR2 and VAR3 not set
 
-    expect(() => {
+    try {
       getRequiredEnv(['VAR1', 'VAR2', 'VAR3']);
-    }).toThrow('Missing required environment variables: VAR2, VAR3');
+      expect.fail('Should have thrown error');
+    } catch (error) {
+      expect((error as Error).message).toContain('MISSING REQUIRED ENVIRONMENT VARIABLES');
+      expect((error as Error).message).toContain('VAR2, VAR3');
+    }
   });
 });
 

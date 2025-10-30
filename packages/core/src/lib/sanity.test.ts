@@ -15,17 +15,27 @@ vi.mock('@sanity/client', () => ({
 
 describe('createSanityClient', () => {
   it('should throw error for missing projectId', () => {
-    expect(() => createSanityClient({
-      projectId: '',
-      dataset: 'production'
-    })).toThrow('Missing Sanity project ID');
+    try {
+      createSanityClient({
+        projectId: '',
+        dataset: 'production'
+      });
+      expect.fail('Should have thrown error');
+    } catch (error) {
+      expect((error as Error).message).toContain('MISSING SANITY PROJECT ID');
+    }
   });
 
   it('should throw error for missing dataset', () => {
-    expect(() => createSanityClient({
-      projectId: 'test123',
-      dataset: ''
-    })).toThrow('Missing Sanity dataset');
+    try {
+      createSanityClient({
+        projectId: 'test123',
+        dataset: ''
+      });
+      expect.fail('Should have thrown error');
+    } catch (error) {
+      expect((error as Error).message).toContain('MISSING SANITY DATASET');
+    }
   });
 
   it('should create client with valid config', () => {

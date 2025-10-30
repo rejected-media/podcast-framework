@@ -10,6 +10,7 @@
 import { createClient } from '@sanity/client';
 import type { SanityClient } from '@sanity/client';
 import type { Episode, Guest, PodcastInfo } from './types';
+import { formatError, formatWarning } from './error-formatter';
 
 /**
  * Create Sanity client with validation
@@ -27,17 +28,35 @@ export function createSanityClient(config: {
 }): SanityClient {
   // Validate required config
   if (!config.projectId) {
-    throw new Error(
-      'Missing Sanity project ID. ' +
-      'Add PUBLIC_SANITY_PROJECT_ID to your environment variables.'
-    );
+    const errorMessage = formatError({
+      title: 'Missing Sanity Project ID',
+      description: 'Your Sanity CMS project ID is required to fetch content. This should be configured in your environment variables.',
+      troubleshooting: [
+        'Create a .env file in your project root if it doesn\'t exist',
+        'Add PUBLIC_SANITY_PROJECT_ID=your-project-id to the .env file',
+        'Find your project ID at https://sanity.io/manage',
+        'Restart your dev server after adding the environment variable',
+      ],
+      docsUrl: 'https://docs.rejected.media/podcast-framework/configuration',
+      example: '# .env\nPUBLIC_SANITY_PROJECT_ID=abc123xy\nPUBLIC_SANITY_DATASET=production',
+    });
+    throw new Error(errorMessage);
   }
 
   if (!config.dataset) {
-    throw new Error(
-      'Missing Sanity dataset. ' +
-      'Add PUBLIC_SANITY_DATASET to your environment variables (usually "production").'
-    );
+    const errorMessage = formatError({
+      title: 'Missing Sanity Dataset',
+      description: 'Your Sanity dataset name is required. Most projects use "production" as the dataset name.',
+      troubleshooting: [
+        'Add PUBLIC_SANITY_DATASET=production to your .env file',
+        'Verify your dataset name at https://sanity.io/manage',
+        'Common dataset names: "production", "development", "staging"',
+        'Restart your dev server after adding the environment variable',
+      ],
+      docsUrl: 'https://docs.rejected.media/podcast-framework/configuration',
+      example: '# .env\nPUBLIC_SANITY_PROJECT_ID=abc123xy\nPUBLIC_SANITY_DATASET=production',
+    });
+    throw new Error(errorMessage);
   }
 
   return createClient({
@@ -539,13 +558,36 @@ export async function getTheme(
       const theme = await client.fetch(query);
 
       if (!theme) {
-        console.warn('No active theme found in Sanity CMS. Using default theme.');
+        const warningMessage = formatWarning({
+          title: 'No Active Theme Found',
+          description: 'No theme document with isActive=true was found in your Sanity CMS. The framework will use default styling.',
+          suggestions: [
+            'Open your Sanity Studio at /sanity/studio',
+            'Create a new Theme document from the content menu',
+            'Configure your colors, typography, and layout',
+            'Set "Active Theme" to true (only one theme can be active)',
+            'Publish the theme document',
+          ],
+          docsUrl: 'https://docs.rejected.media/podcast-framework/theming',
+        });
+        console.warn(warningMessage);
         return null;
       }
 
       // Validate required fields exist
       if (!theme.colors || !theme.typography) {
-        console.error('Theme missing required fields (colors or typography). Using default theme.');
+        const warningMessage = formatWarning({
+          title: 'Invalid Theme Configuration',
+          description: 'Your active theme is missing required fields (colors or typography). The framework will use default styling.',
+          suggestions: [
+            'Open your theme document in Sanity Studio',
+            'Ensure all color fields are filled (primary, secondary, background, etc.)',
+            'Ensure typography section is configured (headingFont, bodyFont, baseFontSize)',
+            'Save and publish the theme document',
+          ],
+          docsUrl: 'https://docs.rejected.media/podcast-framework/theming',
+        });
+        console.error(warningMessage);
         return null;
       }
 

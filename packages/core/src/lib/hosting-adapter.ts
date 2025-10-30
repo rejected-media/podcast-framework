@@ -14,6 +14,7 @@
  */
 
 import type { APIContext } from 'astro';
+import { formatError } from './error-formatter';
 
 export type HostingPlatform = 'cloudflare' | 'netlify' | 'vercel' | 'local' | 'unknown';
 
@@ -132,9 +133,20 @@ export function getRequiredEnv(
   }
 
   if (missing.length > 0) {
-    throw new Error(
-      `Missing required environment variables: ${missing.join(', ')}`
-    );
+    const errorMessage = formatError({
+      title: 'Missing Required Environment Variables',
+      description: `The following environment variables are required but not configured: ${missing.join(', ')}`,
+      troubleshooting: [
+        'Create a .env file in your project root if it doesn\'t exist',
+        `Add the missing variables: ${missing.join(', ')}`,
+        'Check .env.template for examples of all required variables',
+        'Ensure environment variables are properly set in your hosting platform (Cloudflare Pages, Netlify, Vercel, etc.)',
+        'Restart your dev server after adding environment variables',
+      ],
+      docsUrl: 'https://docs.rejected.media/podcast-framework/configuration',
+      example: `# .env\n${missing.map(key => `${key}=your-value-here`).join('\n')}`,
+    });
+    throw new Error(errorMessage);
   }
 
   return result;
