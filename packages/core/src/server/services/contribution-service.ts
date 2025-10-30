@@ -57,6 +57,13 @@ export interface ContributionServiceConfig {
   resendApiKey: string;
   resendFromEmail: string;
   notificationEmail: string;
+  /**
+   * URL to your Sanity Studio for email links
+   * Examples:
+   * - Self-hosted: 'https://yourpodcast.com/sanity/studio'
+   * - Sanity Cloud: 'https://yourpodcast.sanity.studio'
+   * Falls back to STUDIO_URL env var, then PUBLIC_SITE_URL/sanity/studio
+   */
   studioUrl?: string;
 }
 
@@ -270,14 +277,25 @@ export class ContributionService {
     `;
     }
 
-    const studioUrl = this.config.studioUrl || "https://strangewater.xyz";
+    // Get Studio URL from config, environment, or construct from site URL
+    const studioUrl = this.config.studioUrl
+      || (typeof process !== 'undefined' && process.env?.STUDIO_URL)
+      || (typeof process !== 'undefined' && process.env?.PUBLIC_SITE_URL
+          ? `${process.env.PUBLIC_SITE_URL}/sanity/studio`
+          : null);
+
+    if (studioUrl) {
+      content += `
+        <hr style="border: 1px solid #e5e7eb; margin: 20px 0;" />
+        <p style="color: #6b7280; font-size: 14px;">
+          <a href="${studioUrl}/structure/contribution" style="color: #00a3b5; text-decoration: none;">
+            View in Sanity Studio →
+          </a>
+        </p>
+      `;
+    }
+
     content += `
-      <hr style="border: 1px solid #e5e7eb; margin: 20px 0;" />
-      <p style="color: #6b7280; font-size: 14px;">
-        <a href="${studioUrl}/studio/structure/contribution" style="color: #00a3b5; text-decoration: none;">
-          View in Sanity Studio →
-        </a>
-      </p>
     </div>
   `;
 
