@@ -119,6 +119,18 @@ export async function cachedFetch<T>(
 }
 
 /**
+ * Normalize episode data to ensure guests and hosts are always arrays
+ * Sanity returns null for empty reference arrays, but our types expect empty arrays
+ */
+function normalizeEpisode(episode: any): Episode {
+  return {
+    ...episode,
+    guests: episode.guests || [],
+    hosts: episode.hosts || [],
+  };
+}
+
+/**
  * Fetch all episodes
  *
  * @param client - Sanity client
@@ -175,7 +187,7 @@ export async function getAllEpisodes(
 
     try {
       const episodes = await client.fetch(query);
-      return episodes || [];
+      return (episodes || []).map(normalizeEpisode);
     } catch (error) {
       console.error('Failed to fetch episodes from Sanity:', error);
       return [];
@@ -244,7 +256,7 @@ export async function getEpisodeBySlug(
         return null;
       }
 
-      return episode;
+      return normalizeEpisode(episode);
     } catch (error) {
       console.error(`Failed to fetch episode with slug "${slug}" from Sanity:`, error);
       return null;
@@ -302,7 +314,7 @@ export async function getFeaturedEpisodes(
 
     try {
       const episodes = await client.fetch(query);
-      return episodes || [];
+      return (episodes || []).map(normalizeEpisode);
     } catch (error) {
       console.error('Failed to fetch featured episodes from Sanity:', error);
       return [];

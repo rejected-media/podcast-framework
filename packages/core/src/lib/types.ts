@@ -50,8 +50,8 @@ export interface Episode {
   coverImage?: {
     url: string;
   };
-  guests?: Guest[];
-  hosts?: Host[];
+  guests: Guest[]; // Always an array, empty if no guests
+  hosts: Host[]; // Always an array, empty if no hosts
   transcript?: string;
   transcriptSegments?: TranscriptSegment[];
   spotifyLink?: string;
