@@ -11,9 +11,11 @@
  * - Reduced vendor lock-in
  *
  * @see templatization-plan-v2.1-FINAL.md - Hosting abstraction validated
+ *
+ * Note: Uses 'any' for context parameters to avoid type conflicts with different
+ * Astro versions (astro is a peerDependency). Functions accept Astro's APIContext.
  */
 
-import type { APIContext } from 'astro';
 import { formatError } from './error-formatter';
 
 export type HostingPlatform = 'cloudflare' | 'netlify' | 'vercel' | 'local' | 'unknown';
@@ -24,7 +26,7 @@ export type HostingPlatform = 'cloudflare' | 'netlify' | 'vercel' | 'local' | 'u
  * @param context - Astro API context (optional)
  * @returns Platform identifier
  */
-export function detectPlatform(context?: APIContext): HostingPlatform {
+export function detectPlatform(context?: any): HostingPlatform {
   // Check Cloudflare-specific indicators
   if (typeof (globalThis as any).caches !== 'undefined') {
     return 'cloudflare';
@@ -63,7 +65,7 @@ export function detectPlatform(context?: APIContext): HostingPlatform {
  * @param context - Astro API context (required for Cloudflare)
  * @returns Environment variables object
  */
-export function getEnvironmentVariables(context?: APIContext): Record<string, string> {
+export function getEnvironmentVariables(context?: any): Record<string, string> {
   // Cloudflare Pages Functions: env vars are in locals.runtime.env
   if (context?.locals && (context.locals as any).runtime?.env) {
     return (context.locals as any).runtime.env;
@@ -95,7 +97,7 @@ export function getEnvironmentVariables(context?: APIContext): Record<string, st
  * const apiKey = getEnv('API_KEY', context, 'default-key');
  * ```
  */
-export function getEnv(key: string, context?: APIContext, fallback?: string): string {
+export function getEnv(key: string, context?: any, fallback?: string): string {
   const env = getEnvironmentVariables(context);
   return env[key] || fallback || '';
 }
@@ -118,7 +120,7 @@ export function getEnv(key: string, context?: APIContext, fallback?: string): st
  */
 export function getRequiredEnv(
   keys: string[],
-  context?: APIContext
+  context?: any
 ): Record<string, string> {
   const env = getEnvironmentVariables(context);
   const missing: string[] = [];
@@ -158,7 +160,7 @@ export function getRequiredEnv(
  * @param context - Astro API context
  * @returns Client IP address
  */
-export function getClientIP(context: APIContext): string {
+export function getClientIP(context: any): string {
   const { request, clientAddress } = context;
 
   // Cloudflare-specific headers
@@ -183,7 +185,7 @@ export function getClientIP(context: APIContext): string {
  * @param context - Astro API context
  * @returns Platform metadata
  */
-export function getPlatformInfo(context?: APIContext) {
+export function getPlatformInfo(context?: any) {
   const platform = detectPlatform(context);
   const env = getEnvironmentVariables(context);
 
@@ -226,7 +228,7 @@ export function getPlatformInfo(context?: APIContext) {
 export function logError(
   error: unknown,
   context?: Record<string, any>,
-  apiContext?: APIContext
+  apiContext?: any
 ) {
   const platform = detectPlatform(apiContext);
   const errorMessage = error instanceof Error ? error.message : String(error);
